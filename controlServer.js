@@ -11,7 +11,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
   });
 }
 
-const server = http.createServer((bReq, bRes) => {
+const server = http.createServer((bReq, bRes) => { 
   let body = '';
   console.log(bReq.url);
   if (bReq.url !== null && bReq.url !== '/favicon.ico') {
@@ -30,10 +30,14 @@ console.log('Server running at 127.0.0.1:1337');
 
 // Things learned. . .
 // 'pipe' is the same as the following:
+
+// let body = ''
 // sRes.on('data', (data) => {
-//   // body += data;
-//   bRes.write(data);
+//   body += data;
+//   // bRes.write(data);
 // });
 // sRes.on('end', () => {
+//   console.log(body)     
 //   bRes.end();
 // });
+
