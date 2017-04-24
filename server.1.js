@@ -1,7 +1,8 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const httpProxy = require('http-proxy');
+
+const port = process.argv[2];
 
 const server = http.createServer((req, res) => {
   console.log(req.url);
@@ -12,27 +13,13 @@ const server = http.createServer((req, res) => {
     });
   }
   if (req.method === 'GET' && req.url === '/favicon.ico') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });    
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('done');
   }
-  let body = '';
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    // console logging response data
-    res.end('LOOK AT ME\n Server 3000', () => console.log('response completed 3000'));
-    // console.log(res.headers);
-    // req.on('data', (data) => {
-    //   body += data;
-    //   console.log('3000 data buffering');
-    // }).on('end', () => {
-    //   let ip = req.headers['x-forwarded-for'];
-    //   console.log('3000 Requesting Data: ', body);
-    //   console.log('3000 Requesting IP: ', req.connection.remotePort);
-    // });
+    res.end('LOOK AT ME\n Server ' + port, () => console.log('response completed 3000'));
   }
-}).listen(3000, 'ec2-52-53-200-5.us-west-1.compute.amazonaws.com');
-console.log('Server running at 127.0.0.1:3000');
+}).listen(port); // ex ec2-52-53-200-5.us-west-1.compute.amazonaws.com
+console.log('Server running at port' + port);
 
-// server.on('connection', (req, socket) => {
-//   console.log('3000 connected');
-// });

@@ -1,7 +1,6 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const httpProxy = require('http-proxy');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/html') {
@@ -18,9 +17,6 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end('LOOK AT ME\n Server 4000');
   }
-}).listen(4000, '127.0.0.1');
+}).listen(4000);
 console.log('Server running at 127.0.0.1:4000');
 
-server.on('connect', (req, socket) => {
-  console.log('3000 connected');
-});
