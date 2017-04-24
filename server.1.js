@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
     //   console.log('3000 Requesting IP: ', req.connection.remotePort);
     // });
   }
-}).listen(3000, '127.0.0.1');
+}).listen(3000, 'ec2-52-53-200-5.us-west-1.compute.amazonaws.com');
 console.log('Server running at 127.0.0.1:3000');
 
 // server.on('connection', (req, socket) => {
