@@ -20,6 +20,12 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('LOOK AT ME\n Server ' + port, () => console.log('response completed 3000'));
   }
+  if (req.method === 'GET' && req.url === '/bundle.js') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    fs.readFile(path.join(__dirname, 'testPayload/bundle.js'), (err, data) => {
+      res.end(data);
+    });
+  }
 }).listen(port); // ex ec2-52-53-200-5.us-west-1.compute.amazonaws.com
 console.log('Server running at port' + port);
 
