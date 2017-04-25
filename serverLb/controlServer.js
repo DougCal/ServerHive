@@ -10,6 +10,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
     active: true,
   });
 }
+console.log(options);
 
 /*
 10 second interval healthcheck sends dummy get request to servers(ports) to check server health
@@ -60,7 +61,6 @@ const server = http.createServer((bReq, bRes) => {
       options[0].path = bReq.url;
       const originServer = http.request(options[0], (sRes) => {
         console.log('connected');
-        let body = '';
         sRes.on('data', (data) => {
           body += data;
           // bRes.write(data);
