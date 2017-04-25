@@ -5,12 +5,13 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon serverLb/controlServer.js",
+    "startChild": "nodemon testServer/server.js",
+    "startCluster": "nodemon testServer/serverCluster.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "http-proxy": "^1.16.2",
     "node": "0.0.0",
     "node-http-proxy": "^0.2.3",
     "nodemon": "^1.11.0",
