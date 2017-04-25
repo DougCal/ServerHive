@@ -15,4 +15,4 @@ http.createServer((req, res) => {
     res.end('LOOK AT ME\n Server 4000');
   }
 }).listen(4000, '127.0.0.1');
-console.log('Server running at 127.0.0.1:4000');
+console.log('Server running at 127.0.0.1:6379');
