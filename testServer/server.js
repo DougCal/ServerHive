@@ -23,7 +23,7 @@ const server = http.createServer((req, res) => {
   }
   if (req.method === 'GET' && req.url === '/bundle.js') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    fs.readFile(path.join(__dirname, 'testPayload', 'bundle.js'), (err, data) => {
+    fs.readFile(path.join(__dirname, '..', 'testPayload', 'bundle.js'), (err, data) => {
       res.end(data);
     });
   }
