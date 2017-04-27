@@ -125,7 +125,8 @@ const server = http.createServer((bReq, bRes) => {
         });
       });
       originServer.on('error', e => console.log(e));
-      originServer.end();
+      bReq.pipe(originServer);
+      //originServer.end();
     }
   }
 }).listen(1337);
