@@ -55,12 +55,12 @@ function clearCache() {
 const cache = {};
 
 const routes = {
-  'GET/html': null,
+  // 'GET/html': null,
   'GET/': null,
 }
 
 const server = http.createServer((bReq, bRes) => {
-
+  console.log(bReq.headers);
   //flag variable for caching
   let canCache = false;
 
@@ -93,6 +93,8 @@ const server = http.createServer((bReq, bRes) => {
       options.push(options.shift());
       options[0].method = bReq.method;
       options[0].path = bReq.url;
+      options[0].headers = bReq.headers;
+      // Call origin server!!!!!!
       const originServer = http.request(options[0], (sRes) => {
         console.log('connected');
         sRes.on('data', (data) => {
@@ -121,11 +123,20 @@ const server = http.createServer((bReq, bRes) => {
             //cache response
             cache[bReq.method + bReq.url] = body;
           }
+
+          if (sRes.headers['set-cookie']) {
+            console.log(sRes.headers['set-cookie'][0]);
+            //bRes.writeHead(sRes.headers);
+            bRes.writeHead(200, {
+              'Set-Cookie': sRes.headers['set-cookie'][0],
+            });
+          }
           bRes.end(body);
         });
       });
       originServer.on('error', e => console.log(e));
-      originServer.end();
+      bReq.pipe(originServer);
+      // originServer.end();
     }
   }
 }).listen(1337);

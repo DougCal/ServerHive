@@ -10,6 +10,7 @@ class App extends Component {
       password: '',
     }
     this.login = this.login.bind(this);
+    this.verifyUser = this.verifyUser.bind(this);
   }
 
   login() {
@@ -23,6 +24,25 @@ class App extends Component {
     xhr.open('POST', 'login', true);
     xhr.send(JSON.stringify({ username: this.state.username, password: this.state.password }));
     this.setState({ username: '', password: '' })
+  }
+
+  verifyUser() {
+    var xhr = new XMLHttpRequest();
+    const that = this;
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        console.log('verified ', xhr.responseText);
+        if (xhr.responseText === 'true') that.setState({ authenticated: true });
+        console.log(that.state.authenticated);
+      }
+    };
+    xhr.open('GET', 'verifyUser', true);
+    xhr.send();
+  }
+
+  componentDidMount() {
+    this.verifyUser();
+    console.log('verifying. . .');
   }
 
   render() {
@@ -50,5 +70,5 @@ class App extends Component {
   }
 }
 
-  export default App;
+export default App;
 
