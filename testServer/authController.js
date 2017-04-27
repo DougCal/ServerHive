@@ -16,23 +16,30 @@ authController.login = (req, res) => {
   req.on('data', (chunk) => {
     body += chunk;
   }).on('end', () => {
-    res.writeHead(200, { 'Content-Type': 'application/JSON' });
+    //console.log(body);
     body = JSON.parse(body);
     if (body.username === 'yo' && body.password === 'yo') {
       cookie += 1;
       client.set(cookie, body.username, (err, reply) => {
-        console.log(reply);
+        //console.log(req.headers);
         res.writeHead(200, {
           'Set-Cookie': ('session=').concat(cookie),
-          'Content-Type': 'text/plain',
+          'Content-Type': 'application/JSON',
         });
         res.end('true');
       });
     } else res.end('false');
-    // client.get('Darrick', (err, reply) => {
-    //   console.log(reply);
-    // })
   });
+};
+
+authController.verifyUser = (req, cb) => {
+  if (req.headers.cookie && req.headers.cookie.slice(0, 7) === 'session') {
+    const key = req.headers.cookie[req.headers.cookie.length - 1];
+    client.get(key, (err, reply) => {
+      if (reply !== null) return cb(true);
+      return cb(false);
+    });
+  } else return cb(false);
 };
 
 module.exports = authController;

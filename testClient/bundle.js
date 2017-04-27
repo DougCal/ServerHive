@@ -9545,6 +9545,7 @@ var App = function (_Component) {
       password: ''
     };
     _this.login = _this.login.bind(_this);
+    _this.verifyUser = _this.verifyUser.bind(_this);
     return _this;
   }
 
@@ -9561,6 +9562,27 @@ var App = function (_Component) {
       xhr.open('POST', 'login', true);
       xhr.send(JSON.stringify({ username: this.state.username, password: this.state.password }));
       this.setState({ username: '', password: '' });
+    }
+  }, {
+    key: 'verifyUser',
+    value: function verifyUser() {
+      var xhr = new XMLHttpRequest();
+      var that = this;
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log('verified ', xhr.responseText);
+          if (xhr.responseText === 'true') that.setState({ authenticated: true });
+          console.log(that.state.authenticated);
+        }
+      };
+      xhr.open('GET', 'verifyUser', true);
+      xhr.send();
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.verifyUser();
+      console.log('verifying. . .');
     }
   }, {
     key: 'render',
