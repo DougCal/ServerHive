@@ -31,7 +31,6 @@ if (cluster.isMaster) { console.log('cluster is master');
     console.log('Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal);
     console.log('Starting a new worker');
     cluster.fork();
-    mongooseSaver.save(worker.process.pid);
   });
 } else {
   // create a server
