@@ -3,16 +3,22 @@ const http = require('http');
 const loadBalancer = {};
 loadBalancer.cache = {};
 loadBalancer.options = [];
-loadBalancer.routes = {
-  'GET/html': true,
-  'GET/': true,
-};
+loadBalancer.routes = {};
+
+loadBalancer.setRoutes = (routes) => {
+
+  for (let i = 0; i < routes.length; i++) {
+    let temp = routes[i][0].concat(routes[i][1]);
+    loadBalancer.routes[temp] = true;
+  }
+  console.log('final routes obj: ', loadBalancer.routes);
+}
 
 loadBalancer.addOptions = (options) => {
-  console.log(loadBalancer);
+  // console.log(loadBalancer);
   loadBalancer.options = loadBalancer.options.concat(options);
-  console.log('addOptions paramter: ', options);
-  console.log('addOptions lb options: ', loadBalancer.options);
+  // console.log('addOptions paramter: ', options);
+  // console.log('addOptions lb options: ', loadBalancer.options);
 };
 
 loadBalancer.healthCheck = (options = loadBalancer.options, interval = null) => {

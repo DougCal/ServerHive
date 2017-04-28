@@ -13,21 +13,8 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 
 const lb = loadBalancer(options);
-
-// console.log(options);
-
-
-// loadBalancer.healthCheck(options, 10000);
-
-// loadBalancer.clearCache(cache, 800000);
-
-// central server cache
-// const cache = {};
-
-// const routes = {
-//   'GET/html': true,
-//   'GET/': true,
-// };
+const routes = [['GET', '/html'], ['GET', '/']];
+lb.setRoutes(routes);
 
 
 const server = http.createServer((bReq, bRes) => {
