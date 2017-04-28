@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'GET' && req.url === '/') {
+    console.log('server hit');
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('LOOK AT ME\n Server ' + port, () => console.log('response completed from port ' + port));
   }
