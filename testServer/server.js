@@ -2,6 +2,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const originServer = require('./../serverLb/library/originServer');
+const multiThread = require('../serverLb/library/clusterSwitch');
 
 const options = {
   host: '127.0.0.1',
@@ -49,12 +50,12 @@ const server = http.createServer((req, res) => {
       } else res.end('false');
     });
   }
-
   if (req.method === 'GET' && req.url === '/verifyUser') {
     rs.verifySession(req, 'SID', (isVerified) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-}).listen(port); // ex ec2-52-53-200-5.us-west-1.compute.amazonaws.com
-console.log('Server running at port ' + port);
+});
+
+multiThread(server, port);
 

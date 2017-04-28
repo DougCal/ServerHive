@@ -12,7 +12,7 @@ loadBalancer.setRoutes = (routes) => {
     loadBalancer.routes[temp] = true;
   }
   console.log('final routes obj: ', loadBalancer.routes);
-}
+};
 
 loadBalancer.addOptions = (options) => {
   // console.log(loadBalancer);
