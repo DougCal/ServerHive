@@ -26,6 +26,7 @@ originServer.init = (options) => {
 };
 
 const cookieParse = (cookies, target = null) => {
+  if (!cookies) return null;
   const cookieObj = {};
   let arr = cookies.split(';');
   arr = arr.map((value) => { return value.trim(' '); });
