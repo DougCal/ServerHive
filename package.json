@@ -19,6 +19,8 @@
     "babel-preset-react": "^6.24.1",
     "crypto": "0.0.3",
     "css-loader": "^0.28.0",
+    "mongodb": "^2.2.26",
+    "mongoose": "^4.9.6",
     "node": "0.0.0",
     "node-sass": "^4.5.2",
     "nodemon": "^1.11.0",

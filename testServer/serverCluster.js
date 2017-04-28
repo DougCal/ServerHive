@@ -1,7 +1,14 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const cluster = require('cluster');
+const mongoURL = 'mongodb://localhost:27017/ServerHive';
+const mongooseSaver = require('../controllers/routes.js');
+
+mongoose.connect(mongoURL, err => {
+  if (!err) console.log('connected to DB');
+});
 
 const port = process.argv[2];
 
@@ -16,6 +23,7 @@ if (cluster.isMaster) { console.log('cluster is master');
   // let the user know the id of the thread worker
   cluster.on('online', function (worker) {
     console.log('Worker ' + worker.process.pid + ' is online');
+    mongooseSaver.save(worker.process.pid);
   });
 
   // when a worker dies executing code, create another
@@ -28,6 +36,9 @@ if (cluster.isMaster) { console.log('cluster is master');
   // create a server
   http.createServer((req, res) => {
     console.log(`worker ${process.pid} is working`);
+
+    mongooseSaver.update(process.pid);
+
     // send html file on a get request
     if (req.method === 'GET' && req.url === '/html') {
       res.writeHead(200, { 'Content-Type': 'text/html' });
