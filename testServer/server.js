@@ -1,7 +1,14 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const authController = require('./authController');
+const originServer = require('./../serverLb/library/originServer');
+
+const options = {
+  host: '127.0.0.1',
+  port: 6379,
+};
+
+const rs = originServer(options);
 
 const port = process.argv[2];
 console.log(port);
@@ -29,11 +36,22 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'POST' && req.url === '/login') {
-    authController.login(req, res);
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+    }).on('end', () => {
+      body = JSON.parse(body);
+      if (body.username === 'yo' && body.password === 'yo') {
+        rs.authenticate(req, res, 'SID', body.username, (err, reply) => {
+          console.log(reply);
+          res.end('true');
+        });
+      } else res.end('false');
+    });
   }
 
   if (req.method === 'GET' && req.url === '/verifyUser') {
-    authController.verifyUser(req, (isVerified) => {
+    rs.verifySession(req, 'SID', (isVerified) => {
       res.end(JSON.stringify(isVerified));
     });
   }
