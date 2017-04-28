@@ -136,11 +136,6 @@ const server = http.createServer((bReq, bRes) => {
       });
       originServer.on('error', e => console.log(e));
       bReq.pipe(originServer);
-<<<<<<< HEAD
-      //originServer.end();
-=======
-      // originServer.end();
->>>>>>> 7fc6820330e511de72b1b29c1f40694c1b2ec070
     }
   }
 }).listen(1337);
