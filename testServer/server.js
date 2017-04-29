@@ -1,15 +1,17 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const originServer = require('./../serverLb/library/originServer');
-const multiThread = require('../serverLb/library/clusterSwitch');
+const lb = require('../serverLb/library/nodelicious');
+
 
 const options = {
   host: '127.0.0.1',
   port: 6379,
 };
 
-const rs = originServer(options);
+const rs = lb.deploy('redis', options);
+const threads = lb.deploy('threads');
+
 
 const port = process.argv[2];
 console.log(port);
@@ -57,5 +59,5 @@ const server = http.createServer((req, res) => {
   }
 });
 
-multiThread(server, port);
+threads(server, port);
 

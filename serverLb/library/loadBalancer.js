@@ -11,22 +11,20 @@ loadBalancer.setRoutes = (routes) => {
     let temp = routes[i][0].concat(routes[i][1]);
     loadBalancer.routes[temp] = true;
   }
-  console.log('final routes obj: ', loadBalancer.routes);
 };
 
 loadBalancer.addOptions = (options) => {
-  // console.log(loadBalancer);
   loadBalancer.options = loadBalancer.options.concat(options);
-  // console.log('addOptions paramter: ', options);
-  // console.log('addOptions lb options: ', loadBalancer.options);
 };
 
-loadBalancer.healthCheck = (options = loadBalancer.options, interval = null) => {
+loadBalancer.healthCheck = (interval = null) => {
   /*
 15 minute interval healthcheck sends dummy get request to servers(ports) to check server health
 alters 'active' boolean value based on result of health check
   */
   // loops through servers in options & sends mock get request to each
+  const options = loadBalancer.options;
+  console.log(options);
   for (let i = 0; i < options.length; i += 1) {
     http.get(options[i], (res) => {
       if (res.statusCode > 100 && res.statusCode < 400) {
@@ -36,8 +34,7 @@ alters 'active' boolean value based on result of health check
         options[i].active = false;
         console.log('statusCode did not meet criteria, server active set to false');
       }
-      res.on('data', (chunk) => {
-        // console.log(chunk);
+      res.on('end', () => {
         // response from server received, reset value to true if prev false
         if (options[i].active === false) options[i].active = true;
       });
@@ -51,14 +48,14 @@ alters 'active' boolean value based on result of health check
   }
   if (interval !== null) {
     setTimeout(() => {
-      loadBalancer.healthCheck(options, interval);
+      loadBalancer.healthCheck(interval);
     }, interval);
   }
 };
 
-loadBalancer.clearCache = (cache, interval = null) => {
-  cache = {};
-  if (interval === null) {
+loadBalancer.clearCache = (interval = null) => {
+  loadBalancer.cache = {};
+  if (interval !== null) {
     setTimeout(() => {
       loadBalancer.clearCache(cache, interval);
     }, interval);
@@ -99,8 +96,9 @@ loadBalancer.deploy = (bReq, bRes, options = loadBalancer.options, cache = loadB
     let body = '';
     // check for valid request & edge case removes request to '/favicon.ico'
     if (bReq.url !== null && bReq.url !== '/favicon.ico') {
-      console.log('before options used: ', options);
+      // console.log('before options used: ', options);
       options.push(options.shift());
+      if (!options[0].active) options.push(options.shift());
       options[0].method = bReq.method;
       options[0].path = bReq.url;
       options[0].headers = bReq.headers;
@@ -133,7 +131,7 @@ loadBalancer.deploy = (bReq, bRes, options = loadBalancer.options, cache = loadB
 };
 
 loadBalancer.lbInit = (options) => {
-  console.log('init: ', options);
+  // console.log('init: ', options);
   loadBalancer.addOptions(options);
   return loadBalancer;
 };
