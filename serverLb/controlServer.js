@@ -20,6 +20,6 @@ rp.healthCheck(10000);
 const server = http.createServer((bReq, bRes) => {
   // does everything for you
   // loadBalancer.lbHandler(bReq, bRes, options);
-  rp.deploy(bReq, bRes);
+  rp.init(bReq, bRes);
 }).listen(1337);
 console.log('Server running at 127.0.0.1:1337');
