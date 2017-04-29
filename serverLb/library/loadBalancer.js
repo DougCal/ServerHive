@@ -88,7 +88,7 @@ loadBalancer.cacheContent = (body, cache, bReq, routes) => {
   }
 };
 
-loadBalancer.deploy = (bReq, bRes, options = loadBalancer.options, cache = loadBalancer.cache, routes = loadBalancer.routes) => {
+loadBalancer.init = (bReq, bRes, options = loadBalancer.options, cache = loadBalancer.cache, routes = loadBalancer.routes) => {
   if (cache[bReq.method + bReq.url]) {
     console.log('Request response exists, pulling from cache');
     bRes.end(cache[bReq.method + bReq.url]);
