@@ -67,19 +67,15 @@ loadBalancer.clearCache = (cache, interval = null) => {
 
 loadBalancer.isStatic = (bReq) => {
   // if file is html/css/javascript
-  if (bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js') {
-    // flag variable set to true to enable caching before sending response to browser
-    return true;
-  }
-  return false;
+  return bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js';
+  // flag variable set to true to enable caching before sending response to browser
 };
 
 loadBalancer.shouldCache = (bReq, routes) => {
   // user input 'all' to allow cacheEverything method to always work
   // if (bReq === 'all') return true;
   // console.log(routes);
-  if (loadBalancer.isStatic(bReq) || routes[bReq.method + bReq.url] === true) return true;
-  return false;
+  return loadBalancer.isStatic(bReq) || routes[bReq.method + bReq.url] === true;
 };
 
 loadBalancer.cacheContent = (body, cache, bReq, routes) => {
@@ -139,5 +135,3 @@ loadBalancer.lbInit = (options) => {
 };
 
 module.exports = loadBalancer.lbInit;
-
-
