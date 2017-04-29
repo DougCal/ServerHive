@@ -30,4 +30,6 @@ clusterSwitch.init = (server, port) => {
   }
 };
 
-module.exports = clusterSwitch.init;
+module.exports = () => {
+  return clusterSwitch.init;
+};
