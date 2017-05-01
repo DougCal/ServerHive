@@ -1,0 +1,25 @@
+$color-back : linear-gradient(silver,lightslategray);
+$color-book: rgba(255,255,240, 0.5);
+$font: verdana;
+
+body {
+  background: $color-back;
+}
+
+.bar {
+  background-color: black;
+  height: 25px; 
+  width: 200px;
+  margin: 0 auto; 
+  float: left;
+}
+
+.server {
+  height: 50px;
+  clear: both;
+}
+
+.serverData {
+  float: left;
+  width: 150px;
+}

@@ -10,8 +10,8 @@ const lib = {
   redis,
 };
 
-lb.deploy = (featureLib, options) => {
-  return lib[featureLib](options);
+lb.deploy = (featureLib, options, cb) => {
+  return lib[featureLib](options, cb);
 };
 
 module.exports = lb;

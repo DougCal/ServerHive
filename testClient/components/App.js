@@ -1,5 +1,7 @@
 import React from 'react';
+import Stats from './Stats';
 import { Component } from 'react';
+import styles from '../styles/main.scss';
 
 class App extends Component {
   constructor() {
@@ -8,9 +10,11 @@ class App extends Component {
       authenticated: false,
       username: '',
       password: '',
+      stats: [],
     }
     this.login = this.login.bind(this);
     this.verifyUser = this.verifyUser.bind(this);
+    this.getStats = this.getStats.bind(this);
   }
 
   login() {
@@ -40,8 +44,23 @@ class App extends Component {
     xhr.send();
   }
 
+  getStats() {
+    var xhr = new XMLHttpRequest();
+    const that = this;
+    xhr.onreadystatechange = function () {
+      if (this.readyState === 4 && this.status === 200) {
+        // console.log('stats ', xhr.responseText);
+        that.setState({ stats: JSON.parse(xhr.responseText) });
+      }
+    };
+    xhr.open('GET', 'stats', true);
+    xhr.send();
+  }
+
   componentDidMount() {
     this.verifyUser();
+    this.getStats();
+    setInterval(this.getStats, 1000);
     console.log('verifying. . .');
   }
 
@@ -51,6 +70,7 @@ class App extends Component {
         <input type='text' value={this.state.username} onChange={(e) => this.setState({ username: e.target.value })} /> <br />
         <input type='text' value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} /> <br />
         <button onClick={this.login}></button>
+        <Stats stats = {this.state.stats}/>
       </div>
     )
     if (this.state.authenticated === false) {
@@ -58,12 +78,14 @@ class App extends Component {
         <div>
           You're not logged in! <br />
           {loginForm}
+          <Stats stats = {this.state.stats}/>
         </div>
       )
     } else {
       return (
         <div>
           Congrats! You're logged in! <br />
+          <Stats stats = {this.state.stats}/>
         </div>
       )
     }
