@@ -1,15 +1,15 @@
-## Reverse Proxy Setup
+# Reverse Proxy Setup
 
 Include our library using:
 
 const lb = require(‘loadBalancer’);
 
-# Options  —
+## Options  —
 
 Options is a collection of the addresses to the target servers, consisting of their hostnames and ports.
 In order to create the reverse proxy object, it will need this input upon deployment.
 
-# Example:
+## Example:
 
 const options = [];
 for (let i = 2; i < process.argv.length; i += 2) {
@@ -19,7 +19,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
  });
 }
 
-# lb.deploy ( string, array( options ) — 
+## lb.deploy ( string, array( options ) — 
 
 First parameter: is a configuration argument for the reverse proxy server which in this case must be: ’rp’
 Second parameter: will be the options collection created previously created in your ‘rp.js’ file
@@ -30,27 +30,24 @@ lb.deploy triggers the creation of the reverse proxy object.
 lb.deploy has three specific strings that can be used in this library.
 To see the other use cases for lb.deploy in this library -- click here.
 
-# Example:
+## Example:
 const rp = lb.deploy(‘rp’, options);
 
-
-
-
-# rp.addOptions ( options ) —
+rp.addOptions ( options ) —
 
 If further target server options are added, you can use rp.addOptions to update your existing options collection. 
 This method will not overwrite your previous collection.
 
-# Example:
+## Example:
 
 const newOptions = [
  { hostname: '127.0.0.1', port: '3000' },
  { hostname: '127.0.65.120', port: '4000' }
 ]
 
-# rp.addOptions(newOptions);
+## rp.addOptions(newOptions);
 
-# rp.setRoutes ( nestedArray ) —
+## rp.setRoutes ( nestedArray ) —
 
 nestedArray is stored in the reverse proxy server as an object of what routes in your application you would like cached upon first request.
 
@@ -64,11 +61,11 @@ URL (string): will be the portion of your specific route (e.g. ‘/users’, ‘
 
 rp.setRoutes can be called multiple times and will concat the new routes to the routes cache
 
-# Example:
+## Example:
 
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 
-# rp.init ( req , res ) —
+## rp.init ( req , res ) —
 
 **This method sends/ends the response to the client**
 
@@ -80,14 +77,14 @@ Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to child servers if it does not exist in cache
 Receives ‘res’ back from child servers, appends cookie headers to response, and then pipes/ends response back to browser
 
-# Example:
+## Example:
 
 const server = http.createServer((bReq, bRes) => {
  rp.init(bReq, bRes);
 }).listen(1337);
 console.log('Server running at 127.0.0.1:1337');
 
-# rp.healthCheck ( interval[optional] ) —
+## rp.healthCheck ( interval[optional] ) —
 
 Accepts an interval parameter in ms (milliseconds)
 
@@ -99,15 +96,16 @@ If interval has a value, rp.healthCheck will run on that given interval value (e
 
 rp.healthCheck is an integral method in this library ensuring requests make it to target servers that can process them.
 
-# Example:
+## Example:
 
 // interval = 10000 milliseconds
-# rp.healthCheck(10000);
+rp.healthCheck(10000);
 
 // interval is null
-# rp.healthCheck();
+rp.healthCheck();
 
-# rp.clearCache ( interval[optional] ) —
+
+## rp.clearCache ( interval[optional] ) —
 
 Accepts an interval parameter in ms (milliseconds).
 
@@ -121,7 +119,7 @@ rp.clearCache is an integral method in this library to aid in preventing the cac
 It is recommended to utilize this method in some capacity in your application.
 
 
-# Example:
+## Example:
 
 // interval = 10000 milliseconds
 rp.clearCache(10000);
@@ -130,22 +128,20 @@ rp.clearCache(10000);
 rp.clearCache();
 
 
-## Redis Sessions Setup
+# Redis Sessions Setup
 
 const options = {
   host: '127.0.0.1', // —> string hostname or IP address
   port: 6379,        // —> integer port number
 };
 
-# const lb = require(‘loadBalancer’);
-# const rs = lb.deploy(‘redis’, options); 
+## const lb = require(‘loadBalancer’);
+## const rs = lb.deploy(‘redis’, options); 
 
 A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object (see instructions for setting up Redis server). The deploy method requires the Redis server address in the options argument (host/ip and port) and creates/returns the ‘rs’ (Redis sessions) object.
 
 
-# rs.authenticate(req, res, cookieKey, uniqueId, cb)
-
-# Authentication: 
+## rs.authenticate(req, res, cookieKey, uniqueId, cb) // Authentication: 
 Encrypts and saves session cookie in Redis
 Sets cookie in header (DOES NOT END RESPONSE)
 
@@ -155,9 +151,7 @@ cookieKey (string): name of cookie as seen in browser
 uniqueId (string): uniqueId per cookieKey (e.g. username)
 Cb (function): callback function executed after redis save - includes reds error and reply messages (e.g. (err, reply) => {. . .)
 
-# rs.verifySession(req, cookieKey, cb)
-
-# VerifySession: 
+## rs.verifySession(req, cookieKey, cb) // VerifySession: 
 Parses cookies in request header
 Validates session cookies against central redis store
 Returns true or false based on cookie validity
@@ -173,10 +167,9 @@ To make this more relative, say your Target Server is able to handle 100 request
 
 A simple set up to getting threads started
 
-# const threads = lb.deploy(‘threads’);
-# threads('www.example.org', 3000);
-
-# threads(host, port)
+## const threads = lb.deploy(‘threads’);
+## threads('www.example.org', 3000);
+## threads(host, port)
 
 host: string containing the host url
 port: number indicating at what port will the thread respond to (e.g. localhost:3000)
