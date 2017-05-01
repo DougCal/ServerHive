@@ -1,9 +1,5 @@
 const http = require('http');
-// Session stats
-const statsController = require('../../controllers/statsController');
 const EventEmitter = require('events');
-const util = require('util');
-
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -130,7 +126,7 @@ class LoadBalancer extends EventEmitter {
       if (bReq.url !== null && bReq.url !== '/favicon.ico') {
         // console.log('before options used: ', options);
         options.push(options.shift());
-        if (!options[0].active) options.push(options.shift());
+        while (!options[0].active) options.push(options.shift());
         options[0].method = bReq.method;
         options[0].path = bReq.url;
         options[0].headers = bReq.headers;

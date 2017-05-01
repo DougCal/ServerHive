@@ -1,7 +1,7 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const lb = require('../serverLb/library/nodelicious');
+const lb = require('../serverLb/library/nodelb');
 
 
 const options = {
