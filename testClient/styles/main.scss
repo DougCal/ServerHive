@@ -4,22 +4,59 @@ $font: verdana;
 
 body {
   background: $color-back;
+  min-height: 500px;
+  width: 100%;
 }
 
 .bar {
-  background-color: black;
+  background-color: green;
   height: 25px; 
-  width: 200px;
-  margin: 0 auto; 
+  width: 3px;
+  margin: 0px 1px; 
   float: left;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .server {
-  height: 50px;
+  color: darkslategray;
+  height: 150px;
   clear: both;
+  background-image: url('../img/server.jpg');
+  background-size: 100% 100%;
+  margin: 30px;
+  width: 600px;
+  border: 1px solid grey;
+  border-radius: 20px;
+  padding: 10px 20px;
+  box-shadow: 1px 1px 3px green;
 }
 
-.serverData {
-  float: left;
-  width: 150px;
+.serverId {
+  font-size: 25px;
+  width: 300px;
+  padding-bottom: 10px
 }
+
+.serverRequests {
+  font-size: 50px;
+  width: 300px;
+  padding: 10px;
+}
+
+#loginButton {
+  border-radius: 3px;
+}
+
+#loginForm {
+  width: 200px;
+  margin: 100px auto 0 auto;
+}
+
+input {
+  height: 20px;
+  width: 75px;
+  border-radius: 3px;
+  border-style: none;
+  margin-bottom: 6px;
+}
+

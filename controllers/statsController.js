@@ -7,7 +7,7 @@ statsController.session = new Date();
 
 statsController.createSession = (options) => {
   let server = {};
-  server.serverId = 'lb';
+  server.serverId = 'Cached Response';
   server.requests = 0;
   statsController.servers.push(server);
   options.forEach((value) => {

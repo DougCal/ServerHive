@@ -66,19 +66,16 @@ class App extends Component {
 
   render() {
     const loginForm = (
-      <div>
+      <div id = 'loginForm'>
         <input type='text' value={this.state.username} onChange={(e) => this.setState({ username: e.target.value })} /> <br />
         <input type='text' value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} /> <br />
-        <button onClick={this.login}></button>
-        <Stats stats = {this.state.stats}/>
+        <button id = 'loginButton' onClick={this.login}>Login</button>
       </div>
     )
     if (this.state.authenticated === false) {
       return (
         <div>
-          You're not logged in! <br />
           {loginForm}
-          <Stats stats = {this.state.stats}/>
         </div>
       )
     } else {
