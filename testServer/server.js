@@ -1,7 +1,8 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const lb = require('../serverLb/library/nodelb');
+// const lb = require('../serverLb/library/nodelb');
+const lb = require('nodelb');
 
 
 const options = {
@@ -34,6 +35,13 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/bundle.js') {
     res.writeHead(200, { 'Content-Type': 'application/javascript' });
     fs.readFile(path.join(__dirname, '..', 'testClient', 'bundle.js'), (err, data) => {
+      res.end(data);
+    });
+  }
+
+  if (req.method === 'GET' && req.url === '/server.jpg') {
+    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+    fs.readFile(path.join(__dirname, '..', 'testClient', 'img', 'server.jpg'), (err, data) => {
       res.end(data);
     });
   }
