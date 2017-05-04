@@ -171,5 +171,3 @@ class LoadBalancer extends EventEmitter {
 const loadBalancer = new LoadBalancer();
 
 module.exports = loadBalancer.lbInit;
-
-
