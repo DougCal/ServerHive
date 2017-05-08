@@ -1,5 +1,6 @@
 const http = require('http');
 const EventEmitter = require('events');
+const errorLog = require('./errorLog');
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -51,6 +52,7 @@ class LoadBalancer extends EventEmitter {
           if (options[i].active === false) options[i].active = true;
         });
       }).on('error', (e) => {
+        errorLog.write(e);
         console.log('Got Error: '.concat(e.message));
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
         if (e) {
@@ -133,11 +135,13 @@ class LoadBalancer extends EventEmitter {
         // Call origin server!!!!!!
         const originServer = http.request(options[0], (sRes) => {
           console.log('connected');
-          sRes.on('data', (data) => {
+          sRes.on('data', (data, err) => {
+            if (err) errorLog.write(err);
             body += data;
             // bRes.write(data);
           });
-          sRes.on('end', () => {
+          sRes.on('end', (err) => {
+            if (err) errorLog.write(err);
             this.cacheContent(body, cache, bReq, routes);
             // console.log(cache);
 
@@ -151,7 +155,7 @@ class LoadBalancer extends EventEmitter {
             bRes.end(body);
           });
         });
-        originServer.on('error', e => console.log(e));
+        originServer.on('error', e => errorLog.write(e));
         bReq.pipe(originServer);
         // originServer.end();
       }
