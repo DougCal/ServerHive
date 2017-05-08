@@ -41,11 +41,12 @@ class LoadBalancer extends EventEmitter {
     for (let i = 0; i < options.length; i += 1) {
       http.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
-          console.log('statusCode worked');
+          // console.log('statusCode worked');
           if (options[i].active === false) options[i].active = true;
         } else {
+          // errorLog.write(res.statusCode);
           options[i].active = false;
-          console.log('statusCode did not meet criteria, server active set to false');
+          // console.log('statusCode did not meet criteria, server active set to false');
         }
         res.on('end', () => {
           // response from server received, reset value to true if prev false
@@ -53,7 +54,7 @@ class LoadBalancer extends EventEmitter {
         });
       }).on('error', (e) => {
         errorLog.write(e);
-        console.log('Got Error: '.concat(e.message));
+        // console.log('Got Error: '.concat(e.message));
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
         if (e) {
           options[i].active = false;
@@ -96,7 +97,7 @@ class LoadBalancer extends EventEmitter {
   cacheContent(body, cache, bReq, routes) {
     // console.log(loadBalancer.shouldCache(bReq, routes));
     if (this.shouldCache(bReq, routes) === true) {
-      console.log('Successfully cached request result');
+      // console.log('Successfully cached request result');
       // cache response
       cache[bReq.method + bReq.url] = body;
     }
@@ -117,7 +118,7 @@ class LoadBalancer extends EventEmitter {
       // statsController.countRequests('lb');
       this.emit('cacheRes');
 
-      console.log('Request response exists, pulling from cache');
+      // console.log('Request response exists, pulling from cache');
       bRes.end(cache[bReq.method + bReq.url]);
     } else {
       // STATS GATHERING
