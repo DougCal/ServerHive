@@ -53,6 +53,7 @@ class LoadBalancer extends EventEmitter {
           if (options[i].active === false) options[i].active = true;
         });
       }).on('error', (e) => {
+        e.name = "HealthCheck Error";
         errorLog.write(e);
         // console.log('Got Error: '.concat(e.message));
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
@@ -137,7 +138,10 @@ class LoadBalancer extends EventEmitter {
         const originServer = http.request(options[0], (sRes) => {
           console.log('connected');
           sRes.on('data', (data, err) => {
-            if (err) errorLog.write(err);
+            if (err) {
+              err.name = 'Server Response on Data Error'
+              errorLog.write(err);
+            }
             body += data;
             // bRes.write(data);
           });
@@ -156,7 +160,10 @@ class LoadBalancer extends EventEmitter {
             bRes.end(body);
           });
         });
-        originServer.on('error', e => errorLog.write(e));
+        originServer.on('error', e => {
+          e.name = 'Target Server Error';
+          errorLog.write(e);
+        })
         bReq.pipe(originServer);
         // originServer.end();
       }
