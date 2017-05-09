@@ -18,7 +18,8 @@ const secureOpts = {
     cert: fs.readFileSync('server-crt.pem'),
     ca: fs.readFileSync('ca-crt.pem'),
 };
-
+// ONLY uncomment below for testing https with a self-signed certificate
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const rp = lb.deploy('rp', options, () => statsController.createSession(options));
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 rp.healthCheck(10000);
