@@ -1,6 +1,6 @@
 const http = require('http');
-// const lb = require('../serverLb/library/nodelb');
-const lb = require('nodelb');
+const lb = require('../serverLb/library/nodelb');
+// const lb = require('nodelb');
 const statsController = require('../controllers/statsController');
 
 
@@ -14,7 +14,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 
 const rp = lb.deploy('rp', options, () => statsController.createSession(options));
-rp.setRoutes([['GET', '/']]); // ['GET', '/html'] 
+rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 rp.healthCheck(10000);
 rp.on('cacheRes', () => statsController.countRequests('Cached Response'));
 rp.on('targetRes', () => statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port)));
