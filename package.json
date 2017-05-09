@@ -7,8 +7,8 @@
     "start": "npm-run-all --parallel build server",
     "build": "node ./node_modules/.bin/webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon testServer/controlServer.js localhost 3000 localhost 4000 localhost 5000",
     "secureServer": "nodemon testServer/secureControlServer.js localhost 3000 localhost 4000 localhost 5000",
+    "server": "nodemon testServer/controlServer.js localhost 3000 localhost 4000 localhost 5000 --ignore 'ServerHive/testServer/*log'",
     "startChild": "nodemon testServer/server.js",
     "startCluster": "nodemon testServer/serverCluster.js",
     "startSecureChild": "nodemon testServer/secureServer.js"
@@ -23,6 +23,7 @@
     "babel-preset-react": "^6.24.1",
     "crypto": "0.0.3",
     "css-loader": "^0.28.0",
+    "fs": "0.0.1-security",
     "mongodb": "^2.2.26",
     "mongoose": "^4.9.6",
     "node": "0.0.0",

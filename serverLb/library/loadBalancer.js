@@ -1,5 +1,6 @@
 const http = require('http');
 const EventEmitter = require('events');
+const errorLog = require('./errorLog');
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -40,18 +41,21 @@ class LoadBalancer extends EventEmitter {
     for (let i = 0; i < options.length; i += 1) {
       http.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
-          console.log('statusCode worked');
+          // console.log('statusCode worked');
           if (options[i].active === false) options[i].active = true;
         } else {
+          // errorLog.write(res.statusCode);
           options[i].active = false;
-          console.log('statusCode did not meet criteria, server active set to false');
+          // console.log('statusCode did not meet criteria, server active set to false');
         }
         res.on('end', () => {
           // response from server received, reset value to true if prev false
           if (options[i].active === false) options[i].active = true;
         });
       }).on('error', (e) => {
-        console.log('Got Error: '.concat(e.message));
+        e.name = "HealthCheck Error";
+        errorLog.write(e);
+        // console.log('Got Error: '.concat(e.message));
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
         if (e) {
           options[i].active = false;
@@ -90,7 +94,7 @@ class LoadBalancer extends EventEmitter {
   cacheContent(body, cache, bReq, routes) {
     // console.log(loadBalancer.shouldCache(bReq, routes));
     if (this.shouldCache(bReq, routes) === true) {
-      console.log('Successfully cached request result');
+      // console.log('Successfully cached request result');
       // cache response
       cache[bReq.method + bReq.url] = body;
     }
@@ -111,7 +115,7 @@ class LoadBalancer extends EventEmitter {
       // statsController.countRequests('lb');
       this.emit('cacheRes');
 
-      console.log('Request response exists, pulling from cache');
+      // console.log('Request response exists, pulling from cache');
       bRes.end(cache[bReq.method + bReq.url]);
     } else {
       // STATS GATHERING
@@ -132,11 +136,16 @@ class LoadBalancer extends EventEmitter {
         // const originServer = httpsServer.secureServer(httpsServer.options, bRes);
         const originServer = http.request(options[0], (sRes) => {
           console.log('connected');
-          sRes.on('data', (data) => {
+          sRes.on('data', (data, err) => {
+            if (err) {
+              err.name = 'Server Response on Data Error'
+              errorLog.write(err);
+            }
             body += data;
             // bRes.write(data);
           });
-          sRes.on('end', () => {
+          sRes.on('end', (err) => {
+            if (err) errorLog.write(err);
             this.cacheContent(body, cache, bReq, routes);
             // console.log(cache);
 
@@ -150,7 +159,10 @@ class LoadBalancer extends EventEmitter {
             bRes.end(body);
           });
         });
-        originServer.on('error', e => console.log(e));
+        originServer.on('error', e => {
+          e.name = 'Target Server Error';
+          errorLog.write(e);
+        })
         bReq.pipe(originServer);
         // originServer.end();
       }
