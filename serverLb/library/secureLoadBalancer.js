@@ -1,10 +1,12 @@
 const https = require('https');
 const EventEmitter = require('events');
 const fs = require('fs');
+const errorLog = require('./errorLog');
 
 class LoadBalancer extends EventEmitter {
   constructor() {
     super();
+    this.algo = 'lc';
     this.cache = {};
     this.options = [];
     this.routes = {};
@@ -19,6 +21,14 @@ class LoadBalancer extends EventEmitter {
     this.lbInit = this.lbInit.bind(this);
   };
 
+  setAlgoRR() {
+    this.algo = 'rr';
+  }
+
+  setAlgoLC() {
+    this.algo = 'lc';
+  }
+
   setRoutes(routes) {
     for (let i = 0; i < routes.length; i++) {
       let temp = routes[i][0].concat(routes[i][1]);
@@ -27,10 +37,12 @@ class LoadBalancer extends EventEmitter {
   };
 
   addOptions(options) {
-    this.options = this.options.concat(options);
+    for (let i = 1; i < options.length; i += 1) {
+      this.options.push(options[i]);
+    }
   };
 
-  healthCheck(interval = null) { console.log('went into healthCheck');
+  healthCheck(interval = null) {
     /*
   15 minute interval healthcheck sends dummy get request to servers(ports) to check server health
   alters 'active' boolean value based on result of health check
@@ -39,20 +51,19 @@ class LoadBalancer extends EventEmitter {
     const options = this.options;
 
     for (let i = 0; i < options.length; i += 1) {
-      https.get(options[i], (res) => { console.log('made a get request');
+      https.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
-          console.log('statusCode worked');
           if (options[i].active === false) options[i].active = true;
         } else {
           options[i].active = false;
-          console.log('statusCode did not meet criteria, server active set to false');
         }
         res.on('end', () => {
           // response from server received, reset value to true if prev false
           if (options[i].active === false) options[i].active = true;
         });
       }).on('error', (e) => {
-        console.log('Got Error: '.concat(e.message));
+        e.name = "HealthCheck Error";
+        errorLog.write(e);
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
         if (e) {
           options[i].active = false;
@@ -90,8 +101,7 @@ class LoadBalancer extends EventEmitter {
 
   cacheContent(body, cache, bReq, routes) {
     // console.log(loadBalancer.shouldCache(bReq, routes));
-    if (this.shouldCache(bReq, routes) === true) {
-      console.log('Successfully cached request result');
+    if (this.shouldCache(bReq, routes)) {
       // cache response
       cache[bReq.method + bReq.url] = body;
     }
@@ -102,50 +112,67 @@ class LoadBalancer extends EventEmitter {
     const cache = this.cache;
     const routes = this.routes;
 
-    console.log('it\'s in secureLoadBalancer');
     if (cache[bReq.method + bReq.url]) {
-      console.log('went into the if in LoadBalancer');
       // STATS GATHERING
       // statsController.countRequests('lb');
       this.emit('cacheRes');
 
-      console.log('Request response exists, pulling from cache');
       bRes.end(cache[bReq.method + bReq.url]);
     } else {
-      console.log('went inside else of init method');
       // STATS GATHERING
       // statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port));
-      //this.emit('targetRes');
+      this.emit('targetRes');
       let body = '';
       // check for valid request & edge case removes request to '/favicon.ico'
       if (bReq.url !== null && bReq.url !== '/favicon.ico') {
         // console.log('before options used: ', options);
-        console.log(JSON.stringify(options));
-        options.push(options.shift());
-        while (!options[0].active) options.push(options.shift()); console.log('made it past while loop');
-        options[0].method = bReq.method;
-        options[0].path = bReq.url;
-        options[0].headers = bReq.headers;
+        let INDEXTEST = 0;
+        let target = null;
+        if (this.algo === 'rr') {
+          options.push(options.shift());
+          while (!options[0].active) options.push(options.shift());
+          target = options[0];
+        } else if (this.algo === 'lc') {
+          // console.log('here')
+          while (!options[0].active) options.push(options.shift());
+          const min = {};
+          min.reqs = options[0].openRequests;
+          min.option = 0;
+          for (let i = 1; i < options.length; i += 1) {
+            // console.log(options[i].openRequests);
+            if (options[i].openRequests < min.reqs && options[i].active) {
+              min.reqs = options[i].openRequests;
+              min.option = i;
+              INDEXTEST = i;
+              // console.log(min);
+            }
+          }
+          target = options[min.option];
+        }
         // this is where https will have to happen
         // Call origin server!!!!!!
 
         const secureOpts = {
-          hostname: options[0].hostname,
-          port: options[0].port,
-          path: options[0].path,
-          method: options[0].method,
+          hostname: target.hostname,
+          port: target.port,
+          path: bReq.url,
+          headers: bReq.headers,
+          method: bReq.method,
           key: fs.readFileSync('server-key.pem'),
           cert: fs.readFileSync('server-crt.pem'),
           ca: fs.readFileSync('ca-crt.pem'),
         };
 
+        target.openRequests += 1;
+
         const originServer = https.request(secureOpts, (sRes) => {
-          console.log('connected');
           sRes.on('data', (data) => {
             body += data;
             // bRes.write(data);
           });
-          sRes.on('end', () => {
+          sRes.on('end', (err) => {
+            if (err) errorLog.write(err);
+            target.openRequests -= 1;
             this.cacheContent(body, cache, bReq, routes);
             // console.log(cache);
 
@@ -159,21 +186,21 @@ class LoadBalancer extends EventEmitter {
             bRes.end(body);
           });
         });
-        originServer.on('error', e => console.log(e));
+        originServer.on('error', e => {
+          e.name = 'Target Server Error';
+          errorLog.write(e);
+        });
         bReq.pipe(originServer);
         // originServer.end();
       }
     }
-  };
+  }
 
   lbInit(options, cb) {
-    // console.log('init: ', options);
     this.options = options;
-    // initialize options for STATS gathering
-    // statsController.createSession(options);
     cb();
     return this;
-  };
+  }
 }
 
 const loadBalancer = new LoadBalancer();
