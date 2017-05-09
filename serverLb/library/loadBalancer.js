@@ -76,19 +76,15 @@ class LoadBalancer extends EventEmitter {
 
   isStatic(bReq) {
     // if file is html/css/javascript
-    if (bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js') {
+    return bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js';
       // flag variable set to true to enable caching before sending response to browser
-      return true;
-    }
-    return false;
   };
 
   shouldCache(bReq, routes) {
     // user input 'all' to allow cacheEverything method to always work
     // if (bReq === 'all') return true;
     // console.log(routes);
-    if (this.isStatic(bReq) || routes[bReq.method + bReq.url] === true) return true;
-    return false;
+    return this.isStatic(bReq) || routes[bReq.method + bReq.url];
   };
 
   cacheContent(body, cache, bReq, routes) {
@@ -130,7 +126,10 @@ class LoadBalancer extends EventEmitter {
         options[0].method = bReq.method;
         options[0].path = bReq.url;
         options[0].headers = bReq.headers;
+        // this is where https will have to happen
         // Call origin server!!!!!!
+        console.log('went to origin server');
+        // const originServer = httpsServer.secureServer(httpsServer.options, bRes);
         const originServer = http.request(options[0], (sRes) => {
           console.log('connected');
           sRes.on('data', (data) => {
