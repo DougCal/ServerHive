@@ -14,7 +14,7 @@ clusterSwitch.init = (server, port) => {
     }
     // let the user know the id of the thread worker
     cluster.on('online', (worker) => {
-      console.log('Thread ' + worker.process.pid + ' is online');
+      // console.log('Thread ' + worker.process.pid + ' is online');
       // mongooseSaver.save(worker.process.pid);
     });
 
@@ -26,7 +26,7 @@ clusterSwitch.init = (server, port) => {
     });
   } else {
     server.listen(port); // ex ec2-52-53-200-5.us-west-1.compute.amazonaws.com
-    console.log('Server running at port ' + port);
+    // console.log('Server running at port ' + port);
   }
 };
 

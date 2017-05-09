@@ -9553,6 +9553,7 @@ var App = function (_Component) {
     _this.login = _this.login.bind(_this);
     _this.verifyUser = _this.verifyUser.bind(_this);
     _this.getStats = _this.getStats.bind(_this);
+    _this.getStatsSocket = _this.getStatsSocket.bind(_this);
     return _this;
   }
 
@@ -9600,12 +9601,24 @@ var App = function (_Component) {
       xhr.send();
     }
   }, {
+    key: 'getStatsSocket',
+    value: function getStatsSocket() {
+      var ws = new WebSocket('ws://localhost:1337');
+      ws.onopen = function () {
+        ws.send('Im here!');
+      };
+      ws.onmessage = function (m) {
+        console.log('socket', m.data);
+      };
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.verifyUser();
       this.getStats();
       setInterval(this.getStats, 1000);
       console.log('verifying. . .');
+      this.getStatsSocket();
     }
   }, {
     key: 'render',
@@ -9676,7 +9689,7 @@ module.exports = __webpack_require__(122);
 
 var Bar = function Bar(props) {
   var bar = [];
-  console.log(props.request, ' ', props.divisor);
+  // console.log(props.request, ' ', props.divisor);
   for (var i = 0; i < props.requests / props.divisor; i += 1) {
     bar.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'bar' }));
   }
@@ -9713,15 +9726,15 @@ var Bar = function Bar(props) {
 var normalizeBars = function normalizeBars(keys, currStats) {
   var divisor = 1;
   for (var i = 0; i < keys.length; i += 1) {
-    console.log('yo', currStats[keys[i]]);
+    // console.log('yo', currStats[keys[i]]);
     if (currStats[keys[i]] > 120 && currStats[keys[i]] / 120 > divisor) divisor = Math.floor(currStats[keys[i]] / 120) + 1;
   }
-  console.log(divisor);
+  // console.log(divisor);
   return divisor;
 };
 
 var CurrStats = function CurrStats(props) {
-  console.log(props.currStats);
+  // console.log(props.currStats);
   var keys = props.currStats === undefined ? [] : Object.keys(props.currStats);
   var session = [];
   for (var i = 0; i < keys.length; i += 1) {

@@ -15,6 +15,7 @@ class App extends Component {
     this.login = this.login.bind(this);
     this.verifyUser = this.verifyUser.bind(this);
     this.getStats = this.getStats.bind(this);
+    this.getStatsSocket = this.getStatsSocket.bind(this);
   }
 
   login() {
@@ -57,11 +58,22 @@ class App extends Component {
     xhr.send();
   }
 
+  getStatsSocket() {
+    const ws = new WebSocket('ws://localhost:1337');
+    ws.onopen = () => {
+      ws.send('Im here!')
+    }
+    ws.onmessage = (m) => {
+      console.log('socket', m.data);
+    }
+  }
+
   componentDidMount() {
     this.verifyUser();
     this.getStats();
     setInterval(this.getStats, 1000);
     console.log('verifying. . .');
+    this.getStatsSocket();
   }
 
   render() {

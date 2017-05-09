@@ -3,7 +3,7 @@ import React from 'react';
 
 const Bar = (props) => {
   let bar = [];
-  console.log(props.request, ' ', props.divisor);
+  // console.log(props.request, ' ', props.divisor);
   for (let i = 0; i < (props.requests / props.divisor); i += 1) {
     bar.push(<div className ='bar'></div>);
   } 
