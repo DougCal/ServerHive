@@ -1,8 +1,9 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-// const lb = require('../serverLb/library/nodelb');
-const lb = require('nodelb');
+const lb = require('../serverLb/library/nodelb');
+
+// const lb = require('nodelb');
 
 
 const options = {
@@ -15,7 +16,6 @@ const threads = lb.deploy('threads');
 
 
 const port = process.argv[2];
-console.log(port);
 
 const server = http.createServer((req, res) => {
   // console.log(req.headers.cookie);
@@ -68,4 +68,3 @@ const server = http.createServer((req, res) => {
 });
 
 threads(server, port);
-
