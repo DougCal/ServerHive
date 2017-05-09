@@ -20,6 +20,9 @@ clusterSwitch.init = (server, port) => {
 
     // when a worker dies executing code, create another
     cluster.on('exit', (thread, code, signal) => {
+      // to inform the user of dead threads and the information behind it
+      // refer to cluster docs for what these mean
+      console.log(`thread ${thread.process.pid} died with code: ${code} and signal: ${signal}`);
       cluster.fork();
     });
   } else {

@@ -2,9 +2,8 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
-
 // const lb = require('nodelb');
-
+const wsController = require('../controllers/wsController');
 
 const options = {
   host: '127.0.0.1',
@@ -27,7 +26,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'GET' && req.url === '/') {
-    console.log('server hit');
+    // console.log('server hit');
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('LOOK AT ME\n Server ' + port, () => console.log('response completed from port ' + port));
   }
@@ -65,6 +64,7 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-});
+}).listen(port);
 
-threads(server, port);
+wsController(server, port);
+// threads(server, port);
