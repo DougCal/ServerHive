@@ -8,8 +8,10 @@
     "build": "node ./node_modules/.bin/webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon testServer/controlServer.js localhost 3000 localhost 4000 localhost 5000",
+    "secureServer": "nodemon testServer/secureControlServer.js localhost 3000 localhost 4000 localhost 5000",
     "startChild": "nodemon testServer/server.js",
-    "startCluster": "nodemon testServer/serverCluster.js"
+    "startCluster": "nodemon testServer/serverCluster.js",
+    "startSecureChild": "nodemon testServer/secureServer.js"
   },
   "author": "",
   "license": "ISC",
