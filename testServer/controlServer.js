@@ -51,7 +51,7 @@ const server = https.createServer(secureOpts, (bReq, bRes) => {
   console.log(bReq.url);
   console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes, secureOpts);
+  rp.init(bReq, bRes, true);
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 
