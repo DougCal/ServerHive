@@ -7,11 +7,9 @@
     "start": "npm-run-all --parallel build server",
     "build": "node ./node_modules/.bin/webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "secureServer": "nodemon testServer/secureControlServer.js localhost 3000 localhost 4000 localhost 5000",
     "server": "nodemon testServer/controlServer.js localhost 3000 localhost 4000 localhost 5000 --ignore 'ServerHive/testServer/*log'",
     "startChild": "nodemon testServer/server.js",
-    "startCluster": "nodemon testServer/serverCluster.js",
-    "startSecureChild": "nodemon testServer/secureServer.js"
+    "startCluster": "nodemon testServer/serverCluster.js"
   },
   "author": "",
   "license": "ISC",
