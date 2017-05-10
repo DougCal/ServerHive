@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
-// const wsController = require('../controllers/wsController');
+const wsController = require('../controllers/wsController');
 
 const options = {
   host: '127.0.0.1',
@@ -16,15 +16,15 @@ const threads = lb.deploy('threads');
 
 const port = process.argv[2];
 
-// const secureOpts = {
-//     key: fs.readFileSync('server-key.pem'),
-//     cert: fs.readFileSync('server-crt.pem'),
-//     ca: fs.readFileSync('ca-crt.pem'),
-// };
+const secureOpts = {
+  key: fs.readFileSync('server-key.pem'),
+  cert: fs.readFileSync('server-crt.pem'),
+  ca: fs.readFileSync('ca-crt.pem'),
+};
 
 // for testing https, add secureOpts above as the first argument
 // inside the createServer method, and change http to https
-const server = http.createServer((req, res) => {
+const server = https.createServer(secureOpts, (req, res) => {
   if (req.method === 'GET' && req.url === '/html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     fs.readFile(path.join(__dirname, '..', 'index.html'), (err, data) => {
@@ -60,7 +60,7 @@ const server = http.createServer((req, res) => {
       body = JSON.parse(body);
       if (body.username === 'yo' && body.password === 'yo') {
         rs.authenticate(req, res, 'SID', body.username, (err, reply) => {
-          console.log(reply);
+          // console.log(reply);
           res.end('true');
         });
       } else res.end('false');

@@ -74,7 +74,7 @@ class App extends Component {
     setInterval(this.getStats, 1000);
     console.log('verifying. . .');
     // setInterval(this.getStatsSocket, 250);
-    this.getStatsSocket();
+    // this.getStatsSocket();
   }
 
   render() {
