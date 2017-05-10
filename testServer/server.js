@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
       body = JSON.parse(body);
       if (body.username === 'yo' && body.password === 'yo') {
         rs.authenticate(req, res, 'SID', body.username, (err, reply) => {
-          console.log(reply);
+          // console.log(reply);
           res.end('true');
         });
       } else res.end('false');

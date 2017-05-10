@@ -25,6 +25,7 @@ rp.on('cacheRes', () => statsController.countRequests('Cached Response'));
 rp.on('targetRes', () => statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port)));
 
 const server = http.createServer((bReq, bRes) => {
+  console.log(process.memoryUsage().heapUsed); //----------- memory test
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
   rp.init(bReq, bRes);
 }).listen(1337);

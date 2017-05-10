@@ -164,33 +164,31 @@ class LoadBalancer extends EventEmitter {
         serverOptions.port = target.port;
 
         // Call origin server!!!!!!
-        console.log(INDEXTEST, options[0].openRequests, options[1].openRequests, options[2].openRequests);
+        // console.log(INDEXTEST, options[0].openRequests, options[1].openRequests, options[2].openRequests);
         target.openRequests += 1;
         const originServer = http.request(serverOptions, (sRes) => {
-          // console.log('connected');
-          sRes.on('data', (data) => {
-            // if (err) {--------------- DARRICK PLS :)
-            //   err.name = 'Server Response on Data Error'
-            //   errorLog.write(err);
-            // }
-            body += data;
-            // bRes.write(data);
-          });
-          sRes.on('end', (err) => {
-            if (err) errorLog.write(err);
+          console.log(sRes.headers);
+          bRes.writeHead(200, sRes.headers);
+          // if (sRes.headers['set-cookie']) {
+          //   bRes.writeHead(200, {
+          //     'Set-Cookie': sRes.headers['set-cookie'][0],
+          //   });
+          // }
+          if (!this.shouldCache(bReq, routes)) {
+            sRes.pipe(bRes);
             target.openRequests -= 1;
-            this.cacheContent(body, cache, bReq, routes);
-            // console.log(cache);
-
-            if (sRes.headers['set-cookie']) {
-              // console.log(sRes.headers['set-cookie'][0]);
-              // bRes.writeHead(sRes.headers);
-              bRes.writeHead(200, {
-                'Set-Cookie': sRes.headers['set-cookie'][0],
-              });
-            }
-            bRes.end(body);
-          });
+          } else {
+            sRes.on('data', (data) => {
+              body += data;
+            });
+            sRes.on('end', (err) => {
+              // console.log(process.memoryUsage().heapUsed); //----------- memory test
+              if (err) errorLog.write(err);
+              target.openRequests -= 1;
+              this.cacheContent(body, cache, bReq, routes);
+              bRes.end(body);
+            });
+          }
         });
         originServer.on('error', e => {
           e.name = 'Target Server Error';

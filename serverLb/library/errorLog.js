@@ -12,7 +12,7 @@ errorLog.write = (error) => {
         let date = new Date();
         fs.writeFile(errorLog.path, data ? data + date + ': ' + error + '\n' : date + ': ' + error + '\n', 'utf-8', (err) => {
           if (err) console.log(err, 'Write File error');
-          else console.log('File written successfully');
+          // else console.log('File written successfully');
         })
     })
   } else {

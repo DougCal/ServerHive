@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const eventEmitter = require('events');
 
 const findTarget = (servers) => {
-  console.log(servers[0].openSockets, servers[1].openSockets, servers[2].openSockets);
+  // console.log(servers[0].openSockets, servers[1].openSockets, servers[2].openSockets);
   let target = null;
   for (let i = 0; i < servers.length; i += 1) {
     if (target === null && servers[i].active) target = servers[i];
@@ -30,7 +30,7 @@ class WsProxy extends eventEmitter {
         clientWs.on('message', (message) => {
           if (tunnelOpen) {
             targetWs.send(message);
-            console.log(message);
+            // console.log(message);
           } else {
             messageQueue.push(message);
           }
@@ -42,15 +42,14 @@ class WsProxy extends eventEmitter {
             targetServer: { hostname: targetServer.hostname, port: targetServer.port },
           });
           while (messageQueue.length > 0) {
-            targetWs.send(messageQueue[0]);
-            console.log(messageQueue.shift());
+            targetWs.send(messageQueue.shift());
           }
           tunnelOpen = true;
           targetWs.on('message', (message) => {
             clientWs.send(message);
           });
           clientWs.on('close', () => {
-            console.log('client disconnected');
+            // console.log('client disconnected');
             targetWs.close();
           });
           targetWs.on('close', () => {
@@ -63,8 +62,8 @@ class WsProxy extends eventEmitter {
               }
             });
             // console.log(currServer);
-            console.log(currServer[0].targetServer.port, ' disconnected');
-            console.log(this.tunnels.length + ' open sockets');
+            // console.log(currServer[0].targetServer.port, ' disconnected');
+            // console.log(this.tunnels.length + ' open sockets');
             this.tunnels.splice(serverIndex, 1);
             clientWs.close();
           });
