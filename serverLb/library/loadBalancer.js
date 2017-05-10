@@ -111,7 +111,7 @@ class LoadBalancer extends EventEmitter {
         this.healthCheck(interval);
       }, interval);
     }
-  };
+  }
 
   clearCache(interval = null) {
     this.cache = {};
@@ -120,13 +120,14 @@ class LoadBalancer extends EventEmitter {
         this.clearCache(this.cache, interval);
       }, interval);
     }
-  };
+  }
 
   isStatic(bReq) {
     // if file is html/css/javascript
     return bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js';
       // flag variable set to true to enable caching before sending response to browser
   };
+
 
   shouldCache(bReq, routes) {
     // user input 'all' to allow cacheEverything method to always work
@@ -141,7 +142,7 @@ class LoadBalancer extends EventEmitter {
       // cache response
       cache[bReq.method + bReq.url] = body;
     }
-  };
+  }
 
   insecureHTTP(options, body, target, cache, routes, bReq, bRes) {
     return http.request(options, (sRes) => {
@@ -217,8 +218,8 @@ class LoadBalancer extends EventEmitter {
         // console.log('before options used: ', options);
         let INDEXTEST = 0;
         let target = null;
+        options.push(options.shift());
         if (this.algo === 'rr') {
-          options.push(options.shift());
           while (!options[0].active) options.push(options.shift());
           target = options[0];
         } else if (this.algo === 'lc') {

@@ -1,16 +1,32 @@
 const WebSocket = require('ws');
 const eventEmitter = require('events');
 
+const findTarget = (servers) => {
+  console.log(servers[0].openSockets, servers[1].openSockets, servers[2].openSockets);
+  let target = null;
+  for (let i = 0; i < servers.length; i += 1) {
+    if (target === null && servers[i].active) target = servers[i];
+    if (target.openSockets > servers[i].openSockets && servers[i].active) {
+      target = servers[i];
+    }
+  }
+  return target;
+};
+
 class WsProxy extends eventEmitter {
   constructor() {
     super();
-    this.openSockets = [];
+    this.tunnels = [];
     this.init = (server, options) => {
       const wss = new WebSocket.Server({ server });
       wss.on('connection', (clientWs) => {
+        // console.log(options[0].openSockets, options[1].openSockets, options[2].openSockets);
+        // console.log(this.tunnels.length + ' open sockets');
         const messageQueue = [];
         let tunnelOpen = false;
-        const targetWs = new WebSocket(('ws://').concat(options[0].hostname).concat(':').concat(options[0].port));
+        const targetServer = findTarget(options);
+        targetServer.openSockets += 1;
+        const targetWs = new WebSocket(('ws://').concat(targetServer.hostname).concat(':').concat(targetServer.port));
         clientWs.on('message', (message) => {
           if (tunnelOpen) {
             targetWs.send(message);
@@ -20,10 +36,10 @@ class WsProxy extends eventEmitter {
           }
         });
         targetWs.on('open', () => {
-          this.openSockets.push({
+          this.tunnels.push({
             client: clientWs,
             targetSocket: targetWs,
-            targetServer: { hostname: options[0].hostname, port: options[0].port },
+            targetServer: { hostname: targetServer.hostname, port: targetServer.port },
           });
           while (messageQueue.length > 0) {
             targetWs.send(messageQueue[0]);
@@ -38,8 +54,9 @@ class WsProxy extends eventEmitter {
             targetWs.close();
           });
           targetWs.on('close', () => {
+            targetServer.openSockets -= 1;
             let serverIndex;
-            const currServer = this.openSockets.filter((item, i) => {
+            const currServer = this.tunnels.filter((item, i) => {
               if (item.targetSocket === targetWs) {
                 serverIndex = i;
                 return true;
@@ -47,8 +64,8 @@ class WsProxy extends eventEmitter {
             });
             // console.log(currServer);
             console.log(currServer[0].targetServer.port, ' disconnected');
-            console.log(this.openSockets.length + ' open sockets');
-            this.openSockets.splice(serverIndex, 1);
+            console.log(this.tunnels.length + ' open sockets');
+            this.tunnels.splice(serverIndex, 1);
             clientWs.close();
           });
         });
