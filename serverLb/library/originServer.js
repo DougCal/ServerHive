@@ -20,7 +20,7 @@ originServer.setSession = (sessionId, cookieKey, cb) => {
 originServer.init = (options) => {
   originServer.client = redis.createClient(options.port, options.host);
   originServer.client.on('connect', () => {
-    console.log('redis connected');
+    // console.log('redis connected');
   });
   return originServer;
 };

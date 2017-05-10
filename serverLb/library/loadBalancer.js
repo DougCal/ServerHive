@@ -88,6 +88,7 @@ class LoadBalancer extends EventEmitter {
 
     for (let i = 0; i < options.length; i += 1) {
       https.get(options[i], (res) => {
+        console.log(res.statusCode);
         if (res.statusCode > 100 && res.statusCode < 400) {
           if (options[i].active === false) options[i].active = true;
         } else {
@@ -108,7 +109,7 @@ class LoadBalancer extends EventEmitter {
     }
     if (interval !== null) {
       setTimeout(() => {
-        this.healthCheck(interval);
+        this.healthCheckForHTTPS(interval);
       }, interval);
     }
   }
@@ -125,7 +126,7 @@ class LoadBalancer extends EventEmitter {
   isStatic(bReq) {
     // if file is html/css/javascript
     return bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js';
-      // flag variable set to true to enable caching before sending response to browser
+    // flag variable set to true to enable caching before sending response to browser
   };
 
 
@@ -147,53 +148,43 @@ class LoadBalancer extends EventEmitter {
   insecureHTTP(options, body, target, cache, routes, bReq, bRes) {
     return http.request(options, (sRes) => {
       // console.log('connected');
-      sRes.on('data', (data) => {
-        // if (err) {--------------- DARRICK PLS :)
-        //   err.name = 'Server Response on Data Error'
-        //   errorLog.write(err);
-        // }
-        body += data;
-        // bRes.write(data);
-      });
-      sRes.on('end', (err) => {
-        if (err) errorLog.write(err);
+      bRes.writeHead(200, sRes.headers);
+      if (!this.shouldCache(bReq, routes)) {
+        sRes.pipe(bRes);
         target.openRequests -= 1;
-        this.cacheContent(body, cache, bReq, routes);
-        // console.log(cache);
-
-        if (sRes.headers['set-cookie']) {
-          // console.log(sRes.headers['set-cookie'][0]);
-          // bRes.writeHead(sRes.headers);
-          bRes.writeHead(200, {
-            'Set-Cookie': sRes.headers['set-cookie'][0],
-          });
-        }
-        bRes.end(body);
-      });
+      } else {
+        sRes.on('data', (data) => {
+          body += data;
+        });
+        sRes.on('end', (err) => {
+          // console.log(process.memoryUsage().heapUsed); //----------- memory test
+          if (err) errorLog.write(err);
+          target.openRequests -= 1;
+          this.cacheContent(body, cache, bReq, routes);
+          bRes.end(body);
+        });
+      }
     });
   }
 
   secureHTTP(options, body, target, cache, routes, bReq, bRes) {
     return https.request(options, (sRes) => {
-      sRes.on('data', (data) => {
-        body += data;
-        // bRes.write(data);
-      });
-      sRes.on('end', (err) => {
-        if (err) errorLog.write(err);
+      bRes.writeHead(200, sRes.headers);
+      if (!this.shouldCache(bReq, routes)) {
+        sRes.pipe(bRes);
         target.openRequests -= 1;
-        this.cacheContent(body, cache, bReq, routes);
-        // console.log(cache);
-
-        if (sRes.headers['set-cookie']) {
-          //console.log(sRes.headers['set-cookie'][0]);
-          //bRes.writeHead(sRes.headers);
-          bRes.writeHead(200, {
-            'Set-Cookie': sRes.headers['set-cookie'][0],
-          });
-        }
-        bRes.end(body);
-      });
+      } else {
+        sRes.on('data', (data) => {
+          body += data;
+        });
+        sRes.on('end', (err) => {
+          // console.log(process.memoryUsage().heapUsed); //----------- memory test
+          if (err) errorLog.write(err);
+          target.openRequests -= 1;
+          this.cacheContent(body, cache, bReq, routes);
+          bRes.end(body);
+        });
+      }
     });
   };
 
