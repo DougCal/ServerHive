@@ -9618,6 +9618,7 @@ var App = function (_Component) {
       this.getStats();
       setInterval(this.getStats, 1000);
       console.log('verifying. . .');
+      // setInterval(this.getStatsSocket, 250);
       this.getStatsSocket();
     }
   }, {

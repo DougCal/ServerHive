@@ -78,7 +78,7 @@ class LoadBalancer extends EventEmitter {
         this.healthCheck(interval);
       }, interval);
     }
-  };
+  }
 
   clearCache(interval = null) {
     this.cache = {};
@@ -87,16 +87,16 @@ class LoadBalancer extends EventEmitter {
         this.clearCache(this.cache, interval);
       }, interval);
     }
-  };
+  }
 
   isStatic(bReq) {
     // if file is html/css/javascript
-    if (bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.jsx') {
+    if (bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js') {
       // flag variable set to true to enable caching before sending response to browser
       return true;
     }
     return false;
-  };
+  }
 
   shouldCache(bReq, routes) {
     // user input 'all' to allow cacheEverything method to always work
@@ -104,7 +104,7 @@ class LoadBalancer extends EventEmitter {
     // console.log(routes);
     if (this.isStatic(bReq) || routes[bReq.method + bReq.url] === true) return true;
     return false;
-  };
+  }
 
   cacheContent(body, cache, bReq, routes) {
     // console.log(loadBalancer.shouldCache(bReq, routes));
@@ -113,7 +113,7 @@ class LoadBalancer extends EventEmitter {
       // cache response
       cache[bReq.method + bReq.url] = body;
     }
-  };
+  }
 
   init(bReq, bRes) {
     const options = this.options;
@@ -130,8 +130,8 @@ class LoadBalancer extends EventEmitter {
       if (bReq.url !== null && bReq.url !== '/favicon.ico') {
         let INDEXTEST = 0;
         let target = null;
+        options.push(options.shift());
         if (this.algo === 'rr') {
-          options.push(options.shift());
           while (!options[0].active) options.push(options.shift());
           target = options[0];
         } else if (this.algo === 'lc') {
@@ -195,7 +195,7 @@ class LoadBalancer extends EventEmitter {
         originServer.on('error', e => {
           e.name = 'Target Server Error';
           errorLog.write(e);
-        })
+        });
         bReq.pipe(originServer);
         // originServer.end();
       }
