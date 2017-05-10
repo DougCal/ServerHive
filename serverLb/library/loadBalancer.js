@@ -88,7 +88,6 @@ class LoadBalancer extends EventEmitter {
 
     for (let i = 0; i < options.length; i += 1) {
       https.get(options[i], (res) => {
-        console.log(res.statusCode);
         if (res.statusCode > 100 && res.statusCode < 400) {
           if (options[i].active === false) options[i].active = true;
         } else {
@@ -188,7 +187,7 @@ class LoadBalancer extends EventEmitter {
     });
   };
 
-  init(bReq, bRes, secureHTTP = null) {
+  init(bReq, bRes, https = false) {
     const options = this.options;
     const cache = this.cache;
     const routes = this.routes;
@@ -252,9 +251,9 @@ class LoadBalancer extends EventEmitter {
         target.openRequests += 1;
         // console.log(options);
         let originServer;
-        if (secureHTTP) {
-          const secureKeys = Object.keys(secureHTTP);
-          for (let i = 0; i < secureKeys.length; i += 1) serverOptions[secureKeys[i]] = secureHTTP[secureKeys[i]];
+        if (https) {
+          // const secureKeys = Object.keys(secureHTTP);
+          // for (let i = 0; i < secureKeys.length; i += 1) serverOptions[secureKeys[i]] = secureHTTP[secureKeys[i]];
           originServer = this.secureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);
         } else {
           originServer = this.insecureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);
