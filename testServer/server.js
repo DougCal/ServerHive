@@ -1,10 +1,10 @@
 const http = require('http');
+const https = require('https');
 const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
-const wsController = require('../controllers/wsController');
-
+// const wsController = require('../controllers/wsController');
 
 const options = {
   host: '127.0.0.1',
@@ -14,12 +14,17 @@ const options = {
 const rs = lb.deploy('redis', options);
 const threads = lb.deploy('threads');
 
-
 const port = process.argv[2];
-console.log(port);
 
+// const secureOpts = {
+//     key: fs.readFileSync('server-key.pem'),
+//     cert: fs.readFileSync('server-crt.pem'),
+//     ca: fs.readFileSync('ca-crt.pem'),
+// };
+
+// for testing https, add secureOpts above as the first argument
+// inside the createServer method, and change http to https
 const server = http.createServer((req, res) => {
-  // console.log(req.headers.cookie);
   if (req.method === 'GET' && req.url === '/html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     fs.readFile(path.join(__dirname, '..', 'index.html'), (err, data) => {
@@ -66,8 +71,6 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-}).listen(port);
-
-wsController(server, port);
-// threads(server, port);
-
+});
+// wsController(server, port);
+threads(server, port);

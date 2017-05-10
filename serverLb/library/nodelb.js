@@ -1,5 +1,5 @@
 const threads = require('./clusterSwitch');
-const rp = require('./loadBalancer');
+const rp = require('./secureLoadBalancer');
 const redis = require('./originServer');
 
 const lb = {};
