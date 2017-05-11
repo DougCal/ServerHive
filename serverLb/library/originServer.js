@@ -18,6 +18,9 @@ originServer.setSession = (sessionId, cookieKey, cb) => {
 };
 
 originServer.init = (options) => {
+  if (!options.port || !options.host) {
+    throw 'Error: Options parameter needs BOTH a Options.port property & a Options.host property';
+  }
   originServer.client = redis.createClient(options.port, options.host);
   originServer.client.on('connect', () => {
     // console.log('redis connected');
@@ -60,6 +63,9 @@ const hash = (string) => {
 };
 
 originServer.authenticate = (req, res, cookieKey, uniqueId, cb) => {
+  if (uniqueId === null || uniqueId === undefined) throw 'Please provide an ID to hash';
+  if (!cookieKey || cookieKey === undefined) throw 'Please provide a key';
+
   const key = hash(uniqueId);
   originServer.setSession(key, cookieKey, (err, reply) => {
     // console.log(req.headers);

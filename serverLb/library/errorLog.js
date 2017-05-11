@@ -2,6 +2,7 @@ const fs = require('fs');
 const errorLog = {};
 
 errorLog.Init = (path) => {
+  if (path === null) throw 'Error: A file path is a required parameter for errorLog.init'
   errorLog.path = path;
 }
 

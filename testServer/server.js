@@ -24,7 +24,7 @@ const secureOpts = {
 
 // for testing https, add secureOpts above as the first argument
 // inside the createServer method, and change http to https
-const server = https.createServer(secureOpts, (req, res) => {
+const server = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     fs.readFile(path.join(__dirname, '..', 'index.html'), (err, data) => {
@@ -72,5 +72,5 @@ const server = https.createServer(secureOpts, (req, res) => {
     });
   }
 });
-// wsController(server, port);
+wsController(server, port);
 threads(server, port);
