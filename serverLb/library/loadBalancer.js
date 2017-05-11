@@ -31,6 +31,13 @@ class LoadBalancer extends EventEmitter {
   }
 
   setRoutes(routes) {
+    if (routes === null || routes === undefined) {
+      throw 'Set Routes received input that was either null or undefined';
+      //throw 'Error: setRoutes received input that was either NULL or undefined'
+    }
+    if (!Array.isArray(routes)) {
+      throw 'Error: setRoutes expects an input of type "Array", per documentation it expects a nested Array';
+    }
     for (let i = 0; i < routes.length; i++) {
       let temp = routes[i][0].concat(routes[i][1]);
       this.routes[temp] = true;
@@ -38,6 +45,12 @@ class LoadBalancer extends EventEmitter {
   };
 
   addOptions(options) {
+    if (!Array.isArray(options)) {
+      throw 'Error: addOptions expects an input of type "Array"';
+    }
+    if (options === null || options === undefined) {
+      throw 'Error: Options is a required parameter for addOptions';
+    }
     for (let i = 1; i < options.length; i += 1) {
       this.options.push(options[i]);
     }
@@ -189,6 +202,9 @@ class LoadBalancer extends EventEmitter {
   };
 
   init(bReq, bRes, secureHTTP = null) {
+    if (!bReq) throw 'Error: The browser request was not provided to init';
+    if (!bRes) throw 'Error: The browser response was not provided to init';
+
     const options = this.options;
     const cache = this.cache;
     const routes = this.routes;
@@ -270,6 +286,9 @@ class LoadBalancer extends EventEmitter {
   }
 
   lbInit(options, cb) {
+    if (options === null || options === undefined) {
+      throw 'Error: Options is a required parameter for this method';
+    }
     this.options = options;
     cb();
     return this;
