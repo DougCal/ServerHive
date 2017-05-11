@@ -71,6 +71,6 @@ const server = https.createServer(secureOpts, (req, res) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-});
-// wsController(server, port);
-threads(server, port);
+}).listen(port);
+wsController(server, port);
+// threads(server, port);

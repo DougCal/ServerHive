@@ -253,8 +253,8 @@ class LoadBalancer extends EventEmitter {
         // console.log(options);
         let originServer;
         if (secureHTTP) {
-          const secureKeys = Object.keys(secureHTTP);
-          for (let i = 0; i < secureKeys.length; i += 1) serverOptions[secureKeys[i]] = secureHTTP[secureKeys[i]];
+          // const secureKeys = Object.keys(secureHTTP);
+          // for (let i = 0; i < secureKeys.length; i += 1) serverOptions[secureKeys[i]] = secureHTTP[secureKeys[i]];
           originServer = this.secureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);
         } else {
           originServer = this.insecureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);

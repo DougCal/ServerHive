@@ -9553,7 +9553,10 @@ var App = function (_Component) {
     _this.login = _this.login.bind(_this);
     _this.verifyUser = _this.verifyUser.bind(_this);
     _this.getStats = _this.getStats.bind(_this);
-    _this.getStatsSocket = _this.getStatsSocket.bind(_this);
+    _this.openSocket = _this.openSocket.bind(_this);
+    _this.wsSend = function (message) {
+      return console.log('socket not open yet');
+    };
     return _this;
   }
 
@@ -9601,14 +9604,17 @@ var App = function (_Component) {
       xhr.send();
     }
   }, {
-    key: 'getStatsSocket',
-    value: function getStatsSocket() {
-      var ws = new WebSocket('ws://localhost:1337');
+    key: 'openSocket',
+    value: function openSocket() {
+      var ws = new WebSocket('wss://localhost:1337');
       ws.onopen = function () {
         ws.send('Im here!');
       };
       ws.onmessage = function (m) {
         console.log('socket', m.data);
+      };
+      return function (message) {
+        return ws.send(message);
       };
     }
   }, {
@@ -9616,10 +9622,10 @@ var App = function (_Component) {
     value: function componentDidMount() {
       this.verifyUser();
       this.getStats();
-      setInterval(this.getStats, 1000);
+      // setInterval(this.getStats, 1000);
       console.log('verifying. . .');
       // setInterval(this.getStatsSocket, 250);
-      // this.getStatsSocket();
+      this.wsSend = this.openSocket();
     }
   }, {
     key: 'render',
@@ -9655,6 +9661,22 @@ var App = function (_Component) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'button',
+            { onClick: function onClick() {
+                return _this2.wsSend('socket sent');
+              } },
+            'Socket Send'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'button',
+            { onClick: function onClick() {
+                return _this2.getStats();
+              } },
+            'GetStats'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
           'Congrats! You\'re logged in! ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Stats__["a" /* default */], { stats: this.state.stats })
