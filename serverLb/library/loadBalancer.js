@@ -3,6 +3,7 @@ const http = require('http');
 const EventEmitter = require('events');
 const fs = require('fs');
 const errorLog = require('./errorLog');
+const throttleIP = require('./throttleIP');
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -56,7 +57,7 @@ class LoadBalancer extends EventEmitter {
     }
   };
 
-  healthCheck(interval = null) {
+  healthCheck(interval = null, ssl = false) {
     /*
   15 minute interval healthcheck sends dummy get request to servers(ports) to check server health
   alters 'active' boolean value based on result of health check
@@ -64,8 +65,11 @@ class LoadBalancer extends EventEmitter {
     // loops through servers in options & sends mock get request to each
     const options = this.options;
 
+    let protocol;
+    ssl ? protocol = https : protocol = http;
+
     for (let i = 0; i < options.length; i += 1) {
-      http.get(options[i], (res) => {
+      protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
           if (options[i].active === false) options[i].active = true;
         } else {
@@ -86,43 +90,7 @@ class LoadBalancer extends EventEmitter {
     }
     if (interval !== null) {
       setTimeout(() => {
-        this.healthCheck(interval);
-      }, interval);
-    }
-  }
-
-  healthCheckForHTTPS(interval = null) {
-    /*
-  15 minute interval healthcheck sends dummy get request to servers(ports) to check server health
-  alters 'active' boolean value based on result of health check
-    */
-    // loops through servers in options & sends mock get request to each
-    const options = this.options;
-
-    for (let i = 0; i < options.length; i += 1) {
-      https.get(options[i], (res) => {
-        console.log(res.statusCode);
-        if (res.statusCode > 100 && res.statusCode < 400) {
-          if (options[i].active === false) options[i].active = true;
-        } else {
-          options[i].active = false;
-        }
-        res.on('end', () => {
-          // response from server received, reset value to true if prev false
-          if (options[i].active === false) options[i].active = true;
-        });
-      }).on('error', (e) => {
-        e.name = "HealthCheck Error";
-        errorLog.write(e);
-        // if error occurs, set boolean of 'active' to false to ensure no further requests to server
-        if (e) {
-          options[i].active = false;
-        }
-      });
-    }
-    if (interval !== null) {
-      setTimeout(() => {
-        this.healthCheckForHTTPS(interval);
+        this.healthCheck(interval, ssl);
       }, interval);
     }
   }
@@ -158,9 +126,10 @@ class LoadBalancer extends EventEmitter {
     }
   }
 
-  insecureHTTP(options, body, target, cache, routes, bReq, bRes) {
-    return http.request(options, (sRes) => {
-      // console.log('connected');
+  determineProtocol(options, body, target, cache, routes, bReq, bRes, ssl) {
+    let protocol;
+    ssl ? protocol = https : protocol = http;
+    return protocol.request(options, (sRes) => {
       bRes.writeHead(200, sRes.headers);
       if (!this.shouldCache(bReq, routes)) {
         sRes.pipe(bRes);
@@ -180,26 +149,8 @@ class LoadBalancer extends EventEmitter {
     });
   }
 
-  secureHTTP(options, body, target, cache, routes, bReq, bRes) {
-    return https.request(options, (sRes) => {
-      bRes.writeHead(200, sRes.headers);
-      if (!this.shouldCache(bReq, routes)) {
-        sRes.pipe(bRes);
-        target.openRequests -= 1;
-      } else {
-        sRes.on('data', (data) => {
-          body += data;
-        });
-        sRes.on('end', (err) => {
-          // console.log(process.memoryUsage().heapUsed); //----------- memory test
-          if (err) errorLog.write(err);
-          target.openRequests -= 1;
-          this.cacheContent(body, cache, bReq, routes);
-          bRes.end(body);
-        });
-      }
-    });
-  };
+  init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
+    // if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
 
   init(bReq, bRes, secureHTTP = null) {
     if (!bReq) throw 'Error: The browser request was not provided to init';
@@ -248,16 +199,6 @@ class LoadBalancer extends EventEmitter {
         // this is where https will have to happen
         // Call origin server!!!!!!
 
-        // const secureOpts = {
-        //   hostname: target.hostname,
-        //   port: target.port,
-        //   path: bReq.url,
-        //   headers: bReq.headers,
-        //   method: bReq.method,
-        //   key: fs.readFileSync('server-key.pem'),
-        //   cert: fs.readFileSync('server-crt.pem'),
-        //   ca: fs.readFileSync('ca-crt.pem'),
-        // };
         const serverOptions = {};
         serverOptions.method = bReq.method;
         serverOptions.path = bReq.url;
@@ -267,14 +208,8 @@ class LoadBalancer extends EventEmitter {
 
         target.openRequests += 1;
         // console.log(options);
-        let originServer;
-        if (secureHTTP) {
-          const secureKeys = Object.keys(secureHTTP);
-          for (let i = 0; i < secureKeys.length; i += 1) serverOptions[secureKeys[i]] = secureHTTP[secureKeys[i]];
-          originServer = this.secureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);
-        } else {
-          originServer = this.insecureHTTP(serverOptions, body, target, cache, routes, bReq, bRes);
-        }
+        let originServer = this.determineProtocol(serverOptions, body, target, cache, routes, bReq, bRes, ssl);
+
         originServer.on('error', e => {
           e.name = 'Target Server Error';
           errorLog.write(e);
