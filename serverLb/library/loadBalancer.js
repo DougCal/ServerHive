@@ -71,6 +71,7 @@ class LoadBalancer extends EventEmitter {
     for (let i = 0; i < options.length; i += 1) {
       protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
+          console.log(res.statusCode);
           if (options[i].active === false) options[i].active = true;
         } else {
           options[i].active = false;
@@ -206,8 +207,7 @@ class LoadBalancer extends EventEmitter {
 
         target.openRequests += 1;
         // console.log(options);
-        let originServer = this.determineProtocol(serverOptions, body, target, cache, routes, bReq, bRes, ssl);
-
+        const originServer = this.determineProtocol(serverOptions, body, target, cache, routes, bReq, bRes, ssl);
         originServer.on('error', e => {
           e.name = 'Target Server Error';
           errorLog.write(e);
