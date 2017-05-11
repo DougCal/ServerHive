@@ -23,13 +23,31 @@ class LoadBalancer extends EventEmitter {
     this.lbInit = this.lbInit.bind(this);
   };
 
+  /**
+   * Sets Load-Balancing Algorithm to Round-Robin style
+   * @public
+   */
+
   setAlgoRR() {
     this.algo = 'rr';
   }
 
+  /**
+   * Sets Load-Balancing Algorithm to Least Connection style
+   * @public
+   */
+
   setAlgoLC() {
     this.algo = 'lc';
   }
+
+  /**
+   * Stores desired application routes for reverse-proxy to cache responses for
+   * @param {Array} -- Nested Array of Request Type & Route
+   * @public
+   * Example: 
+   * `rp.setRoutes([['GET', '/'], ['GET', '/html']]);`
+   */
 
   setRoutes(routes) {
     if (routes === null || routes === undefined) {
@@ -45,6 +63,20 @@ class LoadBalancer extends EventEmitter {
     }
   };
 
+  /**
+   * Stores specific target server hostname and port information to direct requests to
+   * @param {Object} -- Options object includes specific hostname and port info. for target servers
+   * @public
+   * Example:
+   * `const options = [];
+   *   for (let i = 2; i < process.argv.length; i += 2) {
+   *     options.push({
+   *        hostname: process.argv[i],
+   *        port: process.argv[i + 1],
+   *      });
+   *   }`
+   */
+
   addOptions(options) {
     if (!Array.isArray(options)) {
       throw 'Error: addOptions expects an input of type "Array"';
@@ -57,17 +89,24 @@ class LoadBalancer extends EventEmitter {
     }
   };
 
+  /**
+   * Pings all target servers on an interval (if provided) or when method is called
+   * @param {Number} -- Interval in miliseconds setTimeout (Default: Null)
+   * @param {Boolean} -- True or False if server needs SSL to check HTTPS requests (Default: False)
+   * @public
+   */
+
   healthCheck(interval = null, ssl = false) {
-    /*
-  15 minute interval healthcheck sends dummy get request to servers(ports) to check server health
-  alters 'active' boolean value based on result of health check
-    */
-    // loops through servers in options & sends mock get request to each
+    /**
+     * 15 minute interval healthcheck sends dummy requests to servers to check server health
+     * Alters 'active' property boolean value based on result of health check
+     */
     const options = this.options;
 
     let protocol;
     ssl ? protocol = https : protocol = http;
 
+    // Loops through servers in options & sends mock requests to each
     for (let i = 0; i < options.length; i += 1) {
       protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
@@ -89,12 +128,19 @@ class LoadBalancer extends EventEmitter {
         }
       });
     }
+    //if interval param is provided, repeats checks on provided interval
     if (interval !== null) {
       setTimeout(() => {
         this.healthCheck(interval, ssl);
       }, interval);
     }
   }
+
+  /**
+   * Clears reverse-proxy internal cache
+   * @param {Number} -- Interval in miliseconds for setTimeout (Default: Null)
+   * @public
+   */
 
   clearCache(interval = null) {
     this.cache = {};
@@ -105,12 +151,28 @@ class LoadBalancer extends EventEmitter {
     }
   }
 
+  /** 
+   * Checks if request is considered 'static' - HTML, CSS, JS file
+   * Method is not available to users
+   * @param {Object} -- Browser request object
+   * @return {Boolean} -- True/False if 'static'
+   * @private
+   */
+
   isStatic(bReq) {
-    // if file is html/css/javascript
+    // Returns true if matching any of 3 file types, otherwise returns false
     return bReq.url.slice(bReq.url.length - 5) === '.html' || bReq.url.slice(bReq.url.length - 4) === '.css' || bReq.url.slice(bReq.url.length - 3) === '.js';
-    // flag variable set to true to enable caching before sending response to browser
   };
 
+  /**
+   * Checks return result from isStatic method & if route exists in routes object
+   * Returns boolean based off result of either returning true
+   * Method is not available to users
+   * @param {Object} -- Browser request object
+   * @param {Object} -- Routes object
+   * @return {Boolean} -- True/false if 'static' or exists in routes object
+   * @private
+   */
 
   shouldCache(bReq, routes) {
     // user input 'all' to allow cacheEverything method to always work
@@ -119,6 +181,17 @@ class LoadBalancer extends EventEmitter {
     return this.isStatic(bReq) || routes[bReq.method + bReq.url];
   };
 
+  /**
+   * Caches response in reverse-proxy internal cache for future identical requests
+   * Calls shouldCache and awaits boolean return value
+   * Method is not available to users
+   * @param {Object} -- Response body
+   * @param {Object} -- Internal Cache
+   * @param {Object} -- Browser request object
+   * @param {Object} -- Routes object
+   * @private
+   */
+
   cacheContent(body, cache, bReq, routes) {
     // console.log(loadBalancer.shouldCache(bReq, routes));
     if (this.shouldCache(bReq, routes)) {
@@ -126,6 +199,20 @@ class LoadBalancer extends EventEmitter {
       cache[bReq.method + bReq.url] = body;
     }
   }
+
+  /**
+   * Determines type of request protocol: HTTP or HTTPS
+   * If request is not to be cached, pipe through to target servers, else cache compiled response
+   * @param {Object} -- Options object
+   * @param {Object} -- Response Body
+   * @param {Object} -- Specific server object
+   * @param {Object} -- Internal Cache
+   * @param {Object} -- Routes object
+   * @param {Object} -- Browser request object
+   * @param {Object} -- Browser response object
+   * @param {Boolean} -- SSL boolean value
+   * @public
+   */
 
   determineProtocol(options, body, target, cache, routes, bReq, bRes, ssl) {
     let protocol;
@@ -140,7 +227,6 @@ class LoadBalancer extends EventEmitter {
           body += data;
         });
         sRes.on('end', (err) => {
-          // console.log(process.memoryUsage().heapUsed); //----------- memory test
           if (err) errorLog.write(err);
           target.openRequests -= 1;
           this.cacheContent(body, cache, bReq, routes);
@@ -149,6 +235,16 @@ class LoadBalancer extends EventEmitter {
       }
     });
   }
+
+  /**
+   * Initalize Load-balancer / Reverse-proxy
+   * @param {Object} -- Browser request object
+   * @param {Object} -- Browser response object
+   * @param {Boolean} -- SSL boolean (if using SSL) (Default: False)
+   * @param {Number} -- Delay provided for DDOS throttle (Default: 0)
+   * @param {Number} -- Request count for DDOS throttle (Default: 0)
+   * @public
+   */
 
   init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
     // if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
@@ -160,19 +256,14 @@ class LoadBalancer extends EventEmitter {
     const routes = this.routes;
 
     if (cache[bReq.method + bReq.url]) {
-      // STATS GATHERING
-      // statsController.countRequests('lb');
       this.emit('cacheRes');
 
       bRes.end(cache[bReq.method + bReq.url]);
     } else {
-      // STATS GATHERING
-      // statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port));
       this.emit('targetRes');
       let body = '';
-      // check for valid request & edge case removes request to '/favicon.ico'
+      // checks for valid request & edge case removes request to '/favicon.ico'
       if (bReq.url !== null && bReq.url !== '/favicon.ico') {
-        // console.log('before options used: ', options);
         let INDEXTEST = 0;
         let target = null;
         options.push(options.shift());
@@ -185,7 +276,6 @@ class LoadBalancer extends EventEmitter {
           min.reqs = options[0].openRequests;
           min.option = 0;
           for (let i = 1; i < options.length; i += 1) {
-            // console.log(options[i].openRequests);
             if (options[i].openRequests < min.reqs && options[i].active) {
               min.reqs = options[i].openRequests;
               min.option = i;
@@ -195,8 +285,6 @@ class LoadBalancer extends EventEmitter {
           }
           target = options[min.option];
         }
-        // this is where https will have to happen
-        // Call origin server!!!!!!
 
         const serverOptions = {};
         serverOptions.method = bReq.method;
@@ -206,17 +294,25 @@ class LoadBalancer extends EventEmitter {
         serverOptions.port = target.port;
 
         target.openRequests += 1;
-        // console.log(options);
+
         const originServer = this.determineProtocol(serverOptions, body, target, cache, routes, bReq, bRes, ssl);
+
         originServer.on('error', e => {
           e.name = 'Target Server Error';
           errorLog.write(e);
         });
         bReq.pipe(originServer);
-        // originServer.end();
       }
     }
   }
+
+  /**
+   * Injects target server collection (options) into library
+   * @param {Object} -- Options object
+   * @param {Function} -- Callback exists if you want to take an action before server start/after injection
+   * @return {Object} -- Returns loadBalancer object
+   * @public
+   */
 
   lbInit(options, cb) {
     if (options === null || options === undefined) {

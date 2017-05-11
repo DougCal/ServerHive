@@ -1,6 +1,6 @@
 const ipAddresses = {};
 
-module.exports = (bReq, bRes, delay) => {
+const ddosStopper = (bReq, bRes, delay) => {
 
   const ip = (bReq.headers['x-forwarded-for'] || '').split(',')[0]
     || bReq.connection.remoteAddress;
@@ -12,3 +12,5 @@ module.exports = (bReq, bRes, delay) => {
   if (ipAddresses[ip]) return bRes.end('too soon yo');
   ipAddresses[ip] = true;
 }
+
+module.exports = ddosStopper;
