@@ -151,8 +151,6 @@ class LoadBalancer extends EventEmitter {
 
   init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
     // if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
-
-  init(bReq, bRes, secureHTTP = null) {
     if (!bReq) throw 'Error: The browser request was not provided to init';
     if (!bRes) throw 'Error: The browser response was not provided to init';
 
