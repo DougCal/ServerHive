@@ -13,7 +13,6 @@ const options = {
 
 const rs = lb.deploy('redis', options);
 const threads = lb.deploy('threads');
-
 const port = process.argv[2];
 
 const secureOpts = {

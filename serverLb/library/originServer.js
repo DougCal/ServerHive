@@ -101,6 +101,3 @@ module.exports = originServer.init;
 // rs.authenticate(req, res, cookieKey, uniqueId, cb)
 // rs.verifySession(req, cookieKey, cb)
 // ----------- 
-
-
-
