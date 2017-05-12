@@ -186,7 +186,7 @@ rp.clearCache();
 
 Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
 
-## errorLog.init ( string ) --
+## errorLog.Init ( string ) --
 
 Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
 This method will simply store the file path.
