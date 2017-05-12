@@ -6,7 +6,7 @@ const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
 const errorLog = require('./../serverLb/library/errorLog');
 const statsController = require('../controllers/statsController');
-const wsProxy = require('../serverLb/library/wsproxy.js');
+// const wsProxy = require('../serverLb/library/wsproxy.js');
 
 const options = [];
 for (let i = 2; i < process.argv.length; i += 2) {
@@ -28,13 +28,13 @@ rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 rp.on('cacheRes', () => statsController.countRequests('Cached Response'));
 rp.on('targetRes', () => statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port)));
 
-rp.healthCheck(10000);
-const server = http.createServer((bReq, bRes) => {
-  console.log(process.memoryUsage().heapUsed); //----------- memory test
-  if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes);
-}).listen(1337);
-console.log('Server running at 127.0.0.1:1337');
+// rp.healthCheck(10000);
+// const server = http.createServer((bReq, bRes) => {
+//   console.log(process.memoryUsage().heapUsed); //----------- memory test
+//   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
+//   rp.init(bReq, bRes);
+// }).listen(1337);
+// console.log('Server running at 127.0.0.1:1337');
 
 // uncomment secureOpts for when testing https
 
@@ -47,13 +47,11 @@ const secureOpts = {
   cert: fs.readFileSync('server-crt.pem'),
   ca: fs.readFileSync('ca-crt.pem'),
 };
-rp.healthCheckForHTTPS(10000);
+rp.healthCheck(10000, true);
 const server = https.createServer(secureOpts, (bReq, bRes) => {
-  console.log(bReq.url);
-  console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes, true);
+  rp.init(bReq, bRes, true, 5000, 10);
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 
-wsProxy.init(server, options);
+// wsProxy.init(server, options);
