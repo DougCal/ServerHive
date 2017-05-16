@@ -19,11 +19,11 @@ $ npm install nodelb
  * Least-connections / round-robin load-balancing algorithm for http(s) and web sockets
 
 ### 3. Additional Features :
- 
+
  * Error logging
- 
+
  * IP throttling
- 
+
  * Direct compability with Redis for session storage
 
  * Direct compability with the Node Cluster module for multi-threading Node instances
@@ -127,7 +127,7 @@ rp.setRoutes can be called multiple times and will add the new routes to the rou
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 ```
 
-## rp.init ( req , res, boolean, number[optional], number[optional] ) —
+## rp.init ( req , res, boolean[optional], number[optional], number[optional] ) —
 
 **This method sends/ends the response to the client**
 
@@ -139,11 +139,11 @@ Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to target servers if it does not exist in cache
 Receives ‘res’ back from target servers, appends header to response, and then pipes/ends response back to browser
 
-**Third parameter (boolean):** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+**Third parameter (boolean) - optional:** (defaults to false) To run a server that needs an SSL connection (https protocol), set this argument as true.  For servers with an http protocol, set this to false.
 
 ### DDoS Considerations
 
-***fourth parameter must be used with fifth parameter for the purpose of ip throttling***
+**fourth parameter must be used with fifth parameter for the purpose of ip throttling**
 
 **Fourth parameter (number) - optional:** milliseconds allowed between n (defined below) number of client requests per ip - 500 Server Error will result from violating ip throttling rules setup with fourth and fifth parameters.
 
@@ -211,7 +211,7 @@ The websockets feature extends http(s) routing and load-balancing to websocket c
 
 ## lb.deploy ( string ) —
 
-**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option 
+**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option
 
 ### Example:
 ```javascript
@@ -219,7 +219,7 @@ const ws = lb.deploy(‘wspool'); // or lb.deploy(‘ws');
 ```
 
 ## ws.init ( server, options, boolean[optional] ) —
-This method commences websocket routing. 
+This method commences websocket routing.
 
 **server (previously instatiated http(s) server object)**
 
