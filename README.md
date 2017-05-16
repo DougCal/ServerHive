@@ -160,17 +160,15 @@ console.log('Server running at 127.0.0.1:1337');
 
 ## rp.healthCheck ( interval[optional] , ssl[optional]) —
 
-First parameter accepts an interval in ms (milliseconds)
-
-Second parameter accepts a boolean indicating whether the protocol is http or https.  This parameter defaults to false, setting an http protocol.  For https, set this parameter to true.
-
 rp.healthCheck sends pings from the reverse proxy to all target servers with a test requests to review target server health.
 Uses internal boolean logic to toggle target servers as active or inactive based on results of pings.
 
+**First parameter (number) - optional:** accepts an interval in ms (milliseconds)
+
+**Second parameter (number) - optional:** accepts a boolean indicating whether the protocol is http or https.  This parameter defaults to false, setting an http protocol.  For https, set this parameter to true.
+
 If the interval parameter is NULL, rp.healthCheck can be called by user discretion.
 If interval has a value, rp.healthCheck will run on that given interval value (e.g. every 5 minutes).
-
-rp.healthCheck is an integral method in this library ensuring requests make it to target servers that can process them.
 
 ### Example:
 
@@ -188,13 +186,12 @@ Accepts an interval parameter in ms (milliseconds).
 
 rp.clearCache clears the internal cache of the reverse proxy server.
 
-If the interval parameter is NULL, rp.clearCache can be called by user discretion.
+If the interval parameter is NULL, rp.clearCache can be called by user discretion for a one-time cache clear.
 If interval has a value, rp.clearCache will run on that given interval value (e.g. every 5 minutes).
 
-rp.clearCache is an integral method in this library to aid in preventing the cache from becoming so full of data that it begins to bog down the performance proxy server.
+rp.clearCache is an integral method in this library ensure cached content is fresh. This method also aids in preventing the cache from consuming too much RAM in media heavy applications and bogging down the performance of the proxy server.
 
 It is recommended to utilize this method in some capacity in your application.
-
 
 ### Example:
 
@@ -207,7 +204,7 @@ rp.clearCache();
 ```
 # Websockets Setup
 
-The websockets feature extends http(s) routing and load-balancing to websocket connections. There are two websockets options, pooling and non-pooling. The pooling option expects a pool id message from the client before connecting the persistent web socket tunnel to the appropriate target server handling that web socket pool. The non-pooling options creates persistent web socket tunnels with target servers on a least connection basis.
+The websockets feature extends http/https routing and load-balancing to websocket connections. There are two websockets options, pooling and non-pooling. The pooling option expects a pool id message from the client before connecting the persistent web socket tunnel to the appropriate target server handling that web socket pool. The non-pooling options creates persistent web socket tunnels with target servers on a least connection basis.
 
 ## lb.deploy ( string ) —
 
@@ -223,8 +220,7 @@ This method commences websocket routing.
 
 **server (previously instatiated http(s) server object)**
 
-If further target server options are added, you can use rp.addOptions to update your existing options collection.
-This method will not overwrite your previous collection.
+The server parameter expects the object returned from the http/https createServer method. The websockets feature leverages the same port as http/https server.
 
 **options (array of objects)**
 
@@ -234,6 +230,11 @@ This method will not overwrite your previous collection.
 **boolean (ssl flag)**
 
 The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
+
+**IMPORTANT NOTE ON POOLING FEATURE**
+All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}
+
+
 
 ### Example:
 ```javascript
