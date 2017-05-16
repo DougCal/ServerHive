@@ -231,10 +231,14 @@ class LoadBalancer extends EventEmitter {
    */
 
   init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
-    // if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
     if (!bReq) throw 'Error: The browser request was not provided to init';
     if (!bRes) throw 'Error: The browser response was not provided to init';
-
+    if (delay > 0 && requests > 0 && throttleIP(bReq, bRes, delay, requests) !== undefined) {
+      return throttleIP(bReq, bRes, delay, requests)
+    }
+    if ((delay > 0 && requests <= 0) || (delay <= 0 && requests > 0)) {
+      throw 'Error: both delay and requests need to be defined if you want to throtte ip addresses';
+    }
     const options = this.options;
     const cache = this.cache;
     const routes = this.routes;
