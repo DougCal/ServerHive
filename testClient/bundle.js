@@ -9609,6 +9609,8 @@ var App = function (_Component) {
       var ws = new WebSocket('wss://localhost:1337');
       ws.onopen = function () {
         ws.send('Im here!');
+        // const payload = { socketPoolId: 5 };
+        // ws.send(JSON.stringify(payload));
       };
       ws.onmessage = function (m) {
         console.log('socket', m.data);
@@ -9664,9 +9666,25 @@ var App = function (_Component) {
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'button',
             { onClick: function onClick() {
-                return _this2.wsSend('socket sent');
+                return _this2.wsSend(JSON.stringify({ socketPoolId: 3 }));
               } },
-            'Socket Send'
+            'Socket Send Pool 3'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'button',
+            { onClick: function onClick() {
+                return _this2.wsSend(JSON.stringify({ socketPoolId: 4 }));
+              } },
+            'Socket Send Pool 4'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'button',
+            { onClick: function onClick() {
+                return _this2.wsSend(JSON.stringify({ socketPoolId: 5 }));
+              } },
+            'Socket Send Pool 5'
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
