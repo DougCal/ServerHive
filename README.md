@@ -16,7 +16,7 @@ $ npm install nodelb
 
 ### 2. Load-Balancing features such as :
 
- * Round-robin load-balancing algorithm
+ * Round-robin load-balancing algorithm for http(s) and web sockets
 
  * DDOS Considerations
 
