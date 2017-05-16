@@ -1,6 +1,5 @@
 const ipAddresses = {};
 
-
 const ddosStopper = (bReq, bRes, delay, requests) => {
   const ip = (bReq.headers['x-forwarded-for'] || '').split(',')[0] || bReq.connection.remoteAddress;
   // if ip address does exist in our list of client ip addresses
@@ -8,10 +7,13 @@ const ddosStopper = (bReq, bRes, delay, requests) => {
   if (ipAddresses[ip]) ipAddresses[ip]++;
   else ipAddresses[ip] = 1;
   setTimeout(() => delete ipAddresses[ip], delay);
+
   if (ipAddresses[ip] > requests) {
     bRes.statusCode = 500;
-    return bRes.end('500 Server Error');
+    // console.log('yoyoyoyoyoyoyoyo');
+    return bRes.end('500 Server Error yo');
   }
-}
+};
 
 module.exports = ddosStopper;
+

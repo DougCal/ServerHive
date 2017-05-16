@@ -6,7 +6,7 @@ const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
 const errorLog = require('./../serverLb/library/errorLog');
 const statsController = require('../controllers/statsController');
-// const wsProxy = require('../serverLb/library/wsproxy.js');
+
 
 const options = [];
 for (let i = 2; i < process.argv.length; i += 2) {
@@ -20,7 +20,10 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 
 const rp = lb.deploy('rp', options, () => statsController.createSession(options));
-errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+const wspool = lb.deploy('wspool');
+
+
+errorLog.init(path.join(__dirname + '/healthCheck.log'));
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 // method for checking https
 // method for checking http
@@ -51,11 +54,11 @@ const secureOpts = {
 };
 rp.healthCheck(10000, true);
 const server = https.createServer(secureOpts, (bReq, bRes) => {
+  // console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes, true, 5000, 10);
+  rp.init(bReq, bRes, true) // , 5000, 10);
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 
-
-wsProxy.init(server, options, true);
+wspool.init(server, options, true);
 

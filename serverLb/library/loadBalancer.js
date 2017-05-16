@@ -231,6 +231,7 @@ class LoadBalancer extends EventEmitter {
    */
 
   init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
+    if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
     if (!bReq) throw 'Error: The browser request was not provided to init';
     if (!bRes) throw 'Error: The browser response was not provided to init';
     if (delay > 0 && requests > 0 && throttleIP(bReq, bRes, delay, requests) !== undefined) {
@@ -304,7 +305,7 @@ class LoadBalancer extends EventEmitter {
   lbInit(options, cb) {
     if (options === null || options === undefined) throw 'Error: Options is a required parameter for this method';
     this.options = options;
-    cb();
+    if (cb) cb();
     return this;
   }
 }

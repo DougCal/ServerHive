@@ -31,7 +31,7 @@ class WsProxy extends eventEmitter {
         let tunnelOpen = false;
         const targetServer = findTarget(options);
         targetServer.openSockets += 1;
-        const targetWs = new WebSocket(('wss://').concat(targetServer.hostname).concat(':').concat(targetServer.port));
+        const targetWs = new WebSocket((isSecure ? 'wss://' : 'ws://').concat(targetServer.hostname).concat(':').concat(targetServer.port));
         clientWs.on('message', (message) => {
           if (tunnelOpen) {
             targetWs.send(message);
@@ -78,4 +78,4 @@ class WsProxy extends eventEmitter {
   }
 }
 
-module.exports = new WsProxy();
+module.exports = () => new WsProxy();
