@@ -16,12 +16,14 @@ $ npm install nodelb
 
 ### 2. Load-Balancing features such as :
 
- * Round-robin load-balancing algorithm for http(s) and web sockets
-
- * DDOS Considerations
+ * Least-connections / round-robin load-balancing algorithm for http(s) and web sockets
 
 ### 3. Additional Features :
-
+ 
+ * Error logging
+ 
+ * IP throttling
+ 
  * Direct compability with Redis for session storage
 
  * Direct compability with the Node Cluster module for multi-threading Node instances
@@ -42,26 +44,38 @@ In order to create the reverse proxy object, it will need this input upon deploy
 ### Example:
 
 ```javascript
-const options = [];
-for (let i = 2; i < process.argv.length; i += 2) {
- options.push({
-   hostname: process.argv[i],
-   port: process.argv[i + 1],
- });
-}
+const options = [
+  {
+    hostname: '127.0.0.1',
+    port: 3000,
+  },
+  {
+    hostname: '127.0.0.1',
+    port: 4000,
+  },
+  {
+    hostname: '127.0.0.1',
+    port: 5000,
+  },
+];
 ```
 
-## lb.deploy ( string, array( options ), boolean[optional], function[optional] ) —
-
-**First parameter (string):** is a configuration argument for the reverse proxy server which in this case must be: ’rp’
-
-**Second parameter (array):** will be the options collection created previously created in your ‘rp.js’ file
-
-**Third parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
+## lb.deploy ( string, array( options ), function[optional] ) —
 
 lb.deploy triggers the creation of the reverse proxy object.
 
+**First parameter (string):** is a configuration argument for the reverse proxy server which in this case must be: ’rp’
+
+**Second parameter (array):** will be the options collection created previously (see above)
+
+**Third parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
+
 **‘rp’ is the only valid string input for the first parameter to trigger your reverse proxy setup**
+
+### Example:
+```javascript
+const rp = lb.deploy(‘rp’, options);
+```
 
 lb.deploy has three specific strings that can be used in this library.
 
@@ -73,17 +87,11 @@ To see the other use cases and strings for lb.deploy in this library, click thes
 
 * [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#threads-setup)
 
-### Example:
-```javascript
-const rp = lb.deploy(‘rp’, options);
-```
-
 ## rp.addOptions ( options ) —
 
 **Options (array of objects)**
 
-If further target server options are added, you can use rp.addOptions to update your existing options collection.
-This method will not overwrite your previous collection.
+You can use rp.addOptions to append your existing options collection. This method will not overwrite your previous collection.
 
 ### Example:
 
@@ -107,11 +115,11 @@ Each subarray of routes takes two strings: ‘method’ & ‘url’:
 const routes = [['method', 'URL'], ['method', 'URL']];
 ```
 
-**Method (string):** are usual type of requests (e.g. ‘GET’, ‘POST’, ‘DELETE’, ‘PUT’);
+**Method (string):** are the usual type of requests (e.g. ‘GET’, ‘POST’, ‘DELETE’, ‘PUT’);
 
 **URL (string):** will be the portion of your specific route (e.g. ‘/users’, ‘/puppies’);
 
-rp.setRoutes can be called multiple times and will concat the new routes to the routes cache
+rp.setRoutes can be called multiple times and will add the new routes to the routes cache
 
 ### Example:
 
@@ -128,25 +136,24 @@ The reverse proxy server will cache static files (.HTML, .CSS., .JS) & routes fr
 
 This method does the following:
 Checks cache for existence of incoming ‘req’
-Accepts ‘req’ and pipes it to child servers if it does not exist in cache
-Receives ‘res’ back from child servers, appends cookie headers to response, and then pipes/ends response back to browser
+Accepts ‘req’ and pipes it to target servers if it does not exist in cache
+Receives ‘res’ back from target servers, appends header to response, and then pipes/ends response back to browser
 
-**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https for ssl encryption or false for http
-#### defaults to false when no argument is given**
+**Third parameter (boolean):** to set up your protocol (http/https), put true for https for ssl encryption or false for http
 
 ### DDoS Considerations
 
-***fourth parameter must be used with fifth parameter***
+***fourth parameter must be used with fifth parameter for the purpose of ip throttling***
 
-**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
+**Fourth parameter (number) - optional:** milliseconds allowed between n (defined below) number of client requests per ip - 500 Server Error will result from violating ip throttling rules setup with fourth and fifth parameters.
 
-**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
+**Fifth parameter (number) - optional:** number of requests per ip address allowed within duration set in fourth parameter before responding with a 500 Server Error.
 
 ### Example:
 
 ```javascript
 const server = http.createServer((req, res) => {
- rp.init(req, res);
+ rp.init(req, res, false, 5000, 10);
 }).listen(1337);
 console.log('Server running at 127.0.0.1:1337');
 ```
