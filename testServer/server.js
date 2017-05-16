@@ -13,7 +13,6 @@ const options = {
 
 const rs = lb.deploy('redis', options);
 const threads = lb.deploy('threads');
-
 const port = process.argv[2];
 
 const secureOpts = {
@@ -24,7 +23,7 @@ const secureOpts = {
 
 // for testing https, add secureOpts above as the first argument
 // inside the createServer method, and change http to https
-const server = http.createServer((req, res) => {
+const server = https.createServer(secureOpts, (req, res) => {
   if (req.method === 'GET' && req.url === '/html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     fs.readFile(path.join(__dirname, '..', 'index.html'), (err, data) => {
@@ -71,6 +70,6 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-});
+}).listen(port);
 wsController(server, port);
-threads(server, port);
+// threads(server, port);

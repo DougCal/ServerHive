@@ -195,6 +195,34 @@ rp.clearCache(10000);
 rp.clearCache();
 ```
 
+# Error Log Setup
+
+Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
+
+## errorLog.Init ( string ) --
+
+Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
+This method will simply store the file path.
+
+```javascript
+errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+```
+
+## errorLog.write ( object ) --
+
+Accepts the error object as it's parameter to be written to the log file.
+Method will read the previous copy of the file before re-writing it and concatinating the old data with the new data.
+
+```javascript
+res.on('end', () => {
+// response from server received, reset value to true if prev false
+ if (options[i].active === false) options[i].active = true;
+ });
+ }).on('error', (e) => {
+        e.name = "HealthCheck Error";
+        errorLog.write(e);
+```
+
 # Redis Sessions Setup
 
 A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object

@@ -1,13 +1,10 @@
 const ipAddresses = {};
 
-module.exports = (bReq, bRes, delay, requests) => {
 
-  const ip = (bReq.headers['x-forwarded-for'] || '').split(',')[0]
-      || bReq.connection.remoteAddress;
+const ddosStopper = (bReq, bRes, delay, requests) => {
+  const ip = (bReq.headers['x-forwarded-for'] || '').split(',')[0] || bReq.connection.remoteAddress;
   // if ip address does exist in our list of client ip addresses
-  // we want to make sure that they cannot make a request within 100 ms
-  // of their previous request
-
+  // we want to make sure that they cannot make a request within 100 ms of their previous request
   if (ipAddresses[ip]) ipAddresses[ip]++;
   else ipAddresses[ip] = 1;
   setTimeout(() => delete ipAddresses[ip], delay);
@@ -16,3 +13,5 @@ module.exports = (bReq, bRes, delay, requests) => {
     return bRes.end('500 Server Error');
   }
 }
+
+module.exports = ddosStopper;

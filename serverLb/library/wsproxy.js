@@ -13,11 +13,15 @@ const findTarget = (servers) => {
   return target;
 };
 
+
+// findTarget
+// check to see if pool identifier has been allocated to a server yet
+
 class WsProxy extends eventEmitter {
   constructor() {
     super();
     this.tunnels = [];
-    this.init = (server, options) => {
+    this.init = (server, options, isSecure) => {
       if (options === null || options === undefined) throw 'Error: Options parameter not provided'
       const wss = new WebSocket.Server({ server });
       wss.on('connection', (clientWs) => {
@@ -27,7 +31,7 @@ class WsProxy extends eventEmitter {
         let tunnelOpen = false;
         const targetServer = findTarget(options);
         targetServer.openSockets += 1;
-        const targetWs = new WebSocket(('ws://').concat(targetServer.hostname).concat(':').concat(targetServer.port));
+        const targetWs = new WebSocket(('wss://').concat(targetServer.hostname).concat(':').concat(targetServer.port));
         clientWs.on('message', (message) => {
           if (tunnelOpen) {
             targetWs.send(message);

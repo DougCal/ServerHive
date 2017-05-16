@@ -32,7 +32,9 @@ rp.on('targetRes', () => statsController.countRequests(options[0].hostname.conca
 // const server = http.createServer((bReq, bRes) => {
 //   console.log(process.memoryUsage().heapUsed); //----------- memory test
 //   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-//   rp.init(bReq, bRes);
+
+//   rp.init(bReq, bRes, false);
+
 // }).listen(1337);
 // console.log('Server running at 127.0.0.1:1337');
 
@@ -54,4 +56,6 @@ const server = https.createServer(secureOpts, (bReq, bRes) => {
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 
-// wsProxy.init(server, options);
+
+wsProxy.init(server, options, true);
+
