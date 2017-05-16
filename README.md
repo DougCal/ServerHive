@@ -59,6 +59,8 @@ for (let i = 2; i < process.argv.length; i += 2) {
 
 **Third parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
 
+lb.deploy triggers the creation of the reverse proxy object.
+
 **‘rp’ is the only valid string input for the first parameter to trigger your reverse proxy setup**
 
 lb.deploy has three specific strings that can be used in this library.
@@ -115,7 +117,7 @@ rp.setRoutes can be called multiple times and will concat the new routes to the 
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 ```
 
-## rp.init ( req , res ) —
+## rp.init ( req , res, boolean, number[optional], number[optional] ) —
 
 **This method sends/ends the response to the client**
 
@@ -137,8 +139,6 @@ Receives ‘res’ back from child servers, appends cookie headers to response, 
 **Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
 
 **Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
-
-lb.deploy triggers the creation of the reverse proxy object.
 
 ### Example:
 
