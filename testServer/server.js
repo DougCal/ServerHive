@@ -13,7 +13,6 @@ const options = {
 
 const rs = lb.deploy('redis', options);
 const threads = lb.deploy('threads');
-
 const port = process.argv[2];
 
 const secureOpts = {
@@ -71,6 +70,6 @@ const server = https.createServer(secureOpts, (req, res) => {
       res.end(JSON.stringify(isVerified));
     });
   }
-});
+}).listen(port);
 wsController(server, port);
-threads(server, port);
+// threads(server, port);

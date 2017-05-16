@@ -1,3 +1,5 @@
 node_modules
 npm-debug.log
+testClient/bundle.js
+.gitignore
 .DS_Store

@@ -51,22 +51,13 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 ```
 
-## lb.deploy ( string, array( options ) b —
+## lb.deploy ( string, array( options ), boolean[optional], function[optional] ) —
 
 **First parameter (string):** is a configuration argument for the reverse proxy server which in this case must be: ’rp’
 
 **Second parameter (array):** will be the options collection created previously created in your ‘rp.js’ file
 
-**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https or false for http
-#### defaults to false when no argument is given**
-
-### DDoS Considerations
-
-***Fourth parameter must be used with fifth parameter***
-
-**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
-
-**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
+**Third parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
 
 lb.deploy triggers the creation of the reverse proxy object.
 
@@ -126,7 +117,7 @@ rp.setRoutes can be called multiple times and will concat the new routes to the 
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 ```
 
-## rp.init ( req , res ) —
+## rp.init ( req , res, boolean, number[optional], number[optional] ) —
 
 **This method sends/ends the response to the client**
 
@@ -137,6 +128,17 @@ This method does the following:
 Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to child servers if it does not exist in cache
 Receives ‘res’ back from child servers, appends cookie headers to response, and then pipes/ends response back to browser
+
+**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+#### defaults to false when no argument is given**
+
+### DDoS Considerations
+
+***fourth parameter must be used with fifth parameter***
+
+**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
+
+**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
 
 ### Example:
 
@@ -193,6 +195,34 @@ rp.clearCache(10000);
 
 // interval is null
 rp.clearCache();
+```
+
+# Error Log Setup
+
+Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
+
+## errorLog.Init ( string ) --
+
+Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
+This method will simply store the file path.
+
+```javascript
+errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+```
+
+## errorLog.write ( object ) --
+
+Accepts the error object as it's parameter to be written to the log file.
+Method will read the previous copy of the file before re-writing it and concatinating the old data with the new data.
+
+```javascript
+res.on('end', () => {
+// response from server received, reset value to true if prev false
+ if (options[i].active === false) options[i].active = true;
+ });
+ }).on('error', (e) => {
+        e.name = "HealthCheck Error";
+        errorLog.write(e);
 ```
 
 # Redis Sessions Setup
