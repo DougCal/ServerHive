@@ -57,22 +57,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 
 **Second parameter (array):** will be the options collection created previously created in your ‘rp.js’ file
 
-**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https for ssl encryption or false for http
-
-**Fourth parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
-
-
-#### defaults to false when no argument is given**
-
-### DDoS Considerations
-
-***Fourth parameter must be used with fifth parameter***
-
-**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
-
-**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
-
-lb.deploy triggers the creation of the reverse proxy object.
+**Third parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
 
 **‘rp’ is the only valid string input for the first parameter to trigger your reverse proxy setup**
 
@@ -141,6 +126,19 @@ This method does the following:
 Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to child servers if it does not exist in cache
 Receives ‘res’ back from child servers, appends cookie headers to response, and then pipes/ends response back to browser
+
+**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+#### defaults to false when no argument is given**
+
+### DDoS Considerations
+
+***fourth parameter must be used with fifth parameter***
+
+**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
+
+**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
+
+lb.deploy triggers the creation of the reverse proxy object.
 
 ### Example:
 
