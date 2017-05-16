@@ -10,7 +10,7 @@ const errorLog = {};
  * `errorLog.Init(path.join(__dirname + '/healthCheck.log'));`
 */
 
-errorLog.Init = (path) => {
+errorLog.init = (path) => {
   if (path === null) throw 'Error: A file path is a required parameter for errorLog.init'
   errorLog.path = path;
 }

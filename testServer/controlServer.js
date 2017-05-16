@@ -23,7 +23,7 @@ const rp = lb.deploy('rp', options, () => statsController.createSession(options)
 const wspool = lb.deploy('wspool');
 
 
-errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+errorLog.init(path.join(__dirname + '/healthCheck.log'));
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 // method for checking https
 // method for checking http
@@ -56,7 +56,7 @@ rp.healthCheck(10000, true);
 const server = https.createServer(secureOpts, (bReq, bRes) => {
   // console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes, true, 5000, 10);
+  rp.init(bReq, bRes, true) // , 5000, 10);
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 

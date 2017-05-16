@@ -10,7 +10,8 @@ const ddosStopper = (bReq, bRes, delay, requests) => {
 
   if (ipAddresses[ip] > requests) {
     bRes.statusCode = 500;
-    return bRes.end('500 Server Error');
+    // console.log('yoyoyoyoyoyoyoyo');
+    return bRes.end('500 Server Error yo');
   }
 };
 

@@ -86,7 +86,7 @@ class WsProxyPool extends eventEmitter {
             try {
               pMessage = JSON.parse(message);
             } catch (err) {
-              console.log('prob JSON parse error');
+              console.log('Error: Websocket message dropped. All messages will be dropped until receiving object with key "socketPoolId" when websocket pool feature is deployed.');
             } finally {
               if (pMessage.socketPoolId !== undefined) {
                 poolId = pMessage.socketPoolId;
