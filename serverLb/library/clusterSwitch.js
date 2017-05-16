@@ -17,9 +17,7 @@ clusterSwitch.init = (server, port) => {
       cluster.fork();
     }
     // Lets user know ID of thread workers
-    cluster.on('online', (thread) => {
-      console.log('Thread ' + thread.process.pid + ' is online');
-    });
+    cluster.on('online', (thread) => console.log('Thread ' + thread.process.pid + ' is online'));
     // When worker dies while executing code, creates new one.
     cluster.on('exit', (thread, code, signal) => {
       // to inform the user of dead threads and the information behind it
@@ -28,11 +26,9 @@ clusterSwitch.init = (server, port) => {
       cluster.fork();
     });
   } else {
-    server.listen(port); // ex ec2-52-53-200-5.us-west-1.compute.amazonaws.com
+    server.listen(port);
     console.log('Server running at port ' + port);
   }
 };
 
-module.exports = () => {
-  return clusterSwitch.init;
-};
+module.exports = () => clusterSwitch.init;

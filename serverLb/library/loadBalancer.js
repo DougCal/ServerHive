@@ -50,13 +50,9 @@ class LoadBalancer extends EventEmitter {
    */
 
   setRoutes(routes) {
-    if (routes === null || routes === undefined) {
-      throw 'Set Routes received input that was either null or undefined';
-      //throw 'Error: setRoutes received input that was either NULL or undefined'
-    }
-    if (!Array.isArray(routes)) {
-      throw 'Error: setRoutes expects an input of type "Array", per documentation it expects a nested Array';
-    }
+    if (routes === null || routes === undefined) throw 'Set Routes received input that was either null or undefined';
+    if (!Array.isArray(routes)) throw 'Error: setRoutes expects an input of type "Array", per documentation it expects a nested Array';
+
     for (let i = 0; i < routes.length; i++) {
       let temp = routes[i][0].concat(routes[i][1]);
       this.routes[temp] = true;
@@ -78,12 +74,9 @@ class LoadBalancer extends EventEmitter {
    */
 
   addOptions(options) {
-    if (!Array.isArray(options)) {
-      throw 'Error: addOptions expects an input of type "Array"';
-    }
-    if (options === null || options === undefined) {
-      throw 'Error: Options is a required parameter for addOptions';
-    }
+    if (!Array.isArray(options)) throw 'Error: addOptions expects an input of type "Array"';
+    if (options === null || options === undefined) throw 'Error: Options is a required parameter for addOptions';
+
     for (let i = 1; i < options.length; i += 1) {
       this.options.push(options[i]);
     }
@@ -98,7 +91,7 @@ class LoadBalancer extends EventEmitter {
 
   healthCheck(interval = null, ssl = false) {
     /**
-     * 15 minute interval healthcheck sends dummy requests to servers to check server health
+     * Healthcheck sends dummy requests to servers to check server health
      * Alters 'active' property boolean value based on result of health check
      */
     const options = this.options;
@@ -123,9 +116,7 @@ class LoadBalancer extends EventEmitter {
         e.name = "HealthCheck Error";
         errorLog.write(e);
         // if error occurs, set boolean of 'active' to false to ensure no further requests to server
-        if (e) {
-          options[i].active = false;
-        }
+        if (e) options[i].active = false;
       });
     }
     //if interval param is provided, repeats checks on provided interval
@@ -175,9 +166,6 @@ class LoadBalancer extends EventEmitter {
    */
 
   shouldCache(bReq, routes) {
-    // user input 'all' to allow cacheEverything method to always work
-    // if (bReq === 'all') return true;
-    // console.log(routes);
     return this.isStatic(bReq) || routes[bReq.method + bReq.url];
   };
 
@@ -193,11 +181,7 @@ class LoadBalancer extends EventEmitter {
    */
 
   cacheContent(body, cache, bReq, routes) {
-    // console.log(loadBalancer.shouldCache(bReq, routes));
-    if (this.shouldCache(bReq, routes)) {
-      // cache response
-      cache[bReq.method + bReq.url] = body;
-    }
+    if (this.shouldCache(bReq, routes)) cache[bReq.method + bReq.url] = body;
   }
 
   /**
@@ -256,8 +240,8 @@ class LoadBalancer extends EventEmitter {
     const routes = this.routes;
 
     if (cache[bReq.method + bReq.url]) {
+      // check cache if response exists, else pass it on to target servers
       this.emit('cacheRes');
-
       bRes.end(cache[bReq.method + bReq.url]);
     } else {
       this.emit('targetRes');
@@ -280,7 +264,6 @@ class LoadBalancer extends EventEmitter {
               min.reqs = options[i].openRequests;
               min.option = i;
               INDEXTEST = i;
-              // console.log(min);
             }
           }
           target = options[min.option];
@@ -311,13 +294,11 @@ class LoadBalancer extends EventEmitter {
    * @param {Object} -- Options object
    * @param {Function} -- Callback exists if you want to take an action before server start/after injection
    * @return {Object} -- Returns loadBalancer object
-   * @public
+   * @private
    */
 
   lbInit(options, cb) {
-    if (options === null || options === undefined) {
-      throw 'Error: Options is a required parameter for this method';
-    }
+    if (options === null || options === undefined) throw 'Error: Options is a required parameter for this method';
     this.options = options;
     cb();
     return this;

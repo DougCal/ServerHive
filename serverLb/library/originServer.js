@@ -18,22 +18,22 @@ originServer.setSession = (sessionId, cookieKey, cb) => {
 };
 
 originServer.init = (options) => {
-  if (!options.port || !options.host) {
-    throw 'Error: Options parameter needs BOTH a Options.port property & a Options.host property';
-  }
+  if (!options.port || !options.host) throw 'Error: Options parameter needs BOTH a Options.port property & a Options.host property';
+  
   originServer.client = redis.createClient(options.port, options.host);
   originServer.client.on('connect', () => {
-    // console.log('redis connected');
+    console.log('redis connected');
   });
   return originServer;
 };
 
 const cookieParse = (cookies, target = null) => {
   if (!cookies) return null;
+
   const cookieObj = {};
   let arr = cookies.split(';');
-  arr = arr.map((value) => { return value.trim(' '); });
-  // console.log(arr);
+  arr = arr.map((value) => value.trim(' '));
+
   let cookieSplit;
   for (let i = 0; i < arr.length; i += 1) {
     cookieSplit = arr[i].split('=');
@@ -45,7 +45,6 @@ const cookieParse = (cookies, target = null) => {
 };
 
 originServer.verifySession = (req, cookieKey, cb) => {
-  // console.log(cookieParse(req.headers.cookie));
   const key = cookieParse(req.headers.cookie, cookieKey);
   if (key) {
     originServer.checkSession(key, (err, reply) => {
@@ -68,7 +67,6 @@ originServer.authenticate = (req, res, cookieKey, uniqueId, cb) => {
 
   const key = hash(uniqueId);
   originServer.setSession(key, cookieKey, (err, reply) => {
-    // console.log(req.headers);
     res.writeHead(200, {
       'Set-Cookie': cookieKey.concat('=').concat(key),
       'Content-Type': 'application/JSON',
