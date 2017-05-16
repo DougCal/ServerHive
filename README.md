@@ -20,7 +20,7 @@ $ npm install nodelb
 
  * DDOS Considerations
 
-### 3. Additional Features : 
+### 3. Additional Features :
 
  * Direct compability with Redis for session storage
 
@@ -51,11 +51,22 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 ```
 
-## lb.deploy ( string, array( options ) — 
+## lb.deploy ( string, array( options ) b —
 
 **First parameter (string):** is a configuration argument for the reverse proxy server which in this case must be: ’rp’
 
 **Second parameter (array):** will be the options collection created previously created in your ‘rp.js’ file
+
+**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https or false for http
+#### defaults to false when no argument is given**
+
+### DDoS Considerations
+
+***Fourth parameter must be used with fifth parameter***
+
+**Fourth parameter (number) - optional:** milliseconds of how soon should your server should send a 500 Server Error to a user when n number of requests are past
+
+**Fifth parameter (number) - optional:** number of requests that should send a 500 Server Error when sent within x number of milliseconds
 
 lb.deploy triggers the creation of the reverse proxy object.
 
@@ -65,7 +76,7 @@ lb.deploy has three specific strings that can be used in this library.
 
 To see the other use cases and strings for lb.deploy in this library, click these links:
 
-* [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup) 
+* [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
 
 * [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#threads-setup)
 
@@ -78,13 +89,13 @@ const rp = lb.deploy(‘rp’, options);
 
 **Options (array of objects)**
 
-If further target server options are added, you can use rp.addOptions to update your existing options collection. 
+If further target server options are added, you can use rp.addOptions to update your existing options collection.
 This method will not overwrite your previous collection.
 
 ### Example:
 
 ```javascript
-const newOptions = 
+const newOptions =
 [
  { hostname: '127.0.0.1', port: '3000' },
  { hostname: '127.0.65.120', port: '4000' }
@@ -136,11 +147,13 @@ const server = http.createServer((bReq, bRes) => {
 console.log('Server running at 127.0.0.1:1337');
 ```
 
-## rp.healthCheck ( interval[optional] ) —
+## rp.healthCheck ( interval[optional] , ssl[optional]) —
 
-Accepts an interval parameter in ms (milliseconds)
+First parameter accepts an interval in ms (milliseconds)
 
-rp.healthCheck sends pings from the reverse proxy to all target servers with a test requests to review target server health. 
+Second parameter accepts a boolean indicating whether the protocol is http or https.  This parameter defaults to false, setting an http protocol.  For https, set this parameter to true.
+
+rp.healthCheck sends pings from the reverse proxy to all target servers with a test requests to review target server health.
 Uses internal boolean logic to toggle target servers as active or inactive based on results of pings.
 
 If the interval parameter is NULL, rp.healthCheck can be called by user discretion.
@@ -167,7 +180,7 @@ rp.clearCache clears the internal cache of the reverse proxy server.
 If the interval parameter is NULL, rp.clearCache can be called by user discretion.
 If interval has a value, rp.clearCache will run on that given interval value (e.g. every 5 minutes).
 
-rp.clearCache is an integral method in this library to aid in preventing the cache from becoming so full of data that it begins to bog down the performance proxy server. 
+rp.clearCache is an integral method in this library to aid in preventing the cache from becoming so full of data that it begins to bog down the performance proxy server.
 
 It is recommended to utilize this method in some capacity in your application.
 
@@ -182,10 +195,38 @@ rp.clearCache(10000);
 rp.clearCache();
 ```
 
+# Error Log Setup
+
+Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
+
+## errorLog.Init ( string ) --
+
+Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
+This method will simply store the file path.
+
+```javascript
+errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+```
+
+## errorLog.write ( object ) --
+
+Accepts the error object as it's parameter to be written to the log file.
+Method will read the previous copy of the file before re-writing it and concatinating the old data with the new data.
+
+```javascript
+res.on('end', () => {
+// response from server received, reset value to true if prev false
+ if (options[i].active === false) options[i].active = true;
+ });
+ }).on('error', (e) => {
+        e.name = "HealthCheck Error";
+        errorLog.write(e);
+```
+
 # Redis Sessions Setup
 
-A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object 
-[see Redis documentation for more information on setting up your personal Redis instance](https://redis.io/documentation) 
+A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object
+[see Redis documentation for more information on setting up your personal Redis instance](https://redis.io/documentation)
 The deploy method requires the Redis server address in the options argument (host/ip and port) and creates/returns the ‘rs’ (Redis sessions) object.
 
 ```javascript
@@ -198,7 +239,7 @@ const lb = require(‘nodelb’);
 const rs = lb.deploy(‘redis’, options);
 ```
 
-## rs.authenticate(req, res, cookieKey, uniqueId, cb) // Authentication: 
+## rs.authenticate(req, res, cookieKey, uniqueId, cb) // Authentication:
 
 Encrypts and saves session cookie in Redis
 Sets cookie in header (DOES NOT END RESPONSE)
@@ -215,7 +256,7 @@ Sets cookie in header (DOES NOT END RESPONSE)
 
 Example: `(err, reply) => {. . .}`
 
-## rs.verifySession(req, cookieKey, cb) // VerifySession: 
+## rs.verifySession(req, cookieKey, cb) // VerifySession:
 Parses cookies in request header
 Validates session cookies against central redis store
 Returns true or false based on cookie validity
@@ -224,14 +265,14 @@ Returns true or false based on cookie validity
 
 **cookieKey (string):** name of cookie as seen in browser (targets this cookie name exclusively when validating)
 
-**Cb (function):** callback function with result argument true or false -- 
+**Cb (function):** callback function with result argument true or false --
 
 Example: `(sessionVerified) => {. . .}`
 
 # Threads Setup
 Since node is a single-threaded application natively, we provide the option to use all the threads on your target servers using the Node cluster module. Utilizing this module, the servers will be able to sustain a much higher load than when node is running single-threaded solely.
 
-To make this more relative, say your target server is able to handle 100 requests before it breaks. On a Node server running with 4 threads, it will be able to handle about 200 requests before the server breaks.  Because of its significant impact in balancing load, we made this an option in our library. 
+To make this more relative, say your target server is able to handle 100 requests before it breaks. On a Node server running with 4 threads, it will be able to handle about 200 requests before the server breaks.  Because of its significant impact in balancing load, we made this an option in our library.
 
 The threads will balance requests from the reverse proxy server through the cluster module’s native round-robin algorithm (except on Windows).
 
@@ -251,4 +292,3 @@ threads(host, port);
 **host (string):** string containing the host url
 
 **port (number):** number indicating at what port will the thread respond to (e.g. localhost:3000)
-

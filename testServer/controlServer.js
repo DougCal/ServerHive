@@ -6,7 +6,7 @@ const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
 const errorLog = require('./../serverLb/library/errorLog');
 const statsController = require('../controllers/statsController');
-// const wsProxy = require('../serverLb/library/wsproxypool.js');
+
 
 const options = [];
 for (let i = 2; i < process.argv.length; i += 2) {
@@ -20,7 +20,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 
 const rp = lb.deploy('rp', options, () => statsController.createSession(options));
-const wspool = lb.deploy('ws');
+const wspool = lb.deploy('wspool');
 
 
 errorLog.Init(path.join(__dirname + '/healthCheck.log'));
@@ -31,12 +31,13 @@ rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 rp.on('cacheRes', () => statsController.countRequests('Cached Response'));
 rp.on('targetRes', () => statsController.countRequests(options[0].hostname.concat(':').concat(options[0].port)));
 
-
 // rp.healthCheck(10000);
 // const server = http.createServer((bReq, bRes) => {
 //   console.log(process.memoryUsage().heapUsed); //----------- memory test
 //   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
+
 //   rp.init(bReq, bRes, false);
+
 // }).listen(1337);
 // console.log('Server running at 127.0.0.1:1337');
 
@@ -53,12 +54,11 @@ const secureOpts = {
 };
 rp.healthCheck(10000, true);
 const server = https.createServer(secureOpts, (bReq, bRes) => {
-  // console.log(bReq.url);
   // console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
-  rp.init(bReq, bRes, true, 2, 2);
-  console.log('options', options);
+  rp.init(bReq, bRes, true, 5000, 10);
 }).listen(1337);
 console.log('Server blah running at 127.0.0.1:1337');
 
 wspool.init(server, options, true);
+
