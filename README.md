@@ -67,6 +67,8 @@ lb.deploy has three specific strings that can be used in this library.
 
 To see the other use cases and strings for lb.deploy in this library, click these links:
 
+* [Websocket Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
+
 * [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
 
 * [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#threads-setup)
@@ -143,8 +145,8 @@ Receives ‘res’ back from child servers, appends cookie headers to response, 
 ### Example:
 
 ```javascript
-const server = http.createServer((bReq, bRes) => {
- rp.init(bReq, bRes);
+const server = http.createServer((req, res) => {
+ rp.init(req, res);
 }).listen(1337);
 console.log('Server running at 127.0.0.1:1337');
 ```
@@ -195,6 +197,44 @@ rp.clearCache(10000);
 
 // interval is null
 rp.clearCache();
+```
+# Websockets Setup
+
+The websockets feature extends http(s) routing and load-balancing to websocket connections. There are two websockets options, pooling and non-pooling. The pooling option expects a pool id message from the client before connecting the persistent web socket tunnel to the appropriate target server handling that web socket pool. The non-pooling options creates persistent web socket tunnels with target servers on a least connection basis.
+
+## lb.deploy ( string ) —
+
+**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option 
+
+### Example:
+```javascript
+const ws = lb.deploy(‘wspool'); // or lb.deploy(‘ws');
+```
+
+## ws.init ( server, options, boolean[optional] ) —
+This method commences websocket routing. 
+
+**server (previously instatiated http(s) server object)**
+
+If further target server options are added, you can use rp.addOptions to update your existing options collection.
+This method will not overwrite your previous collection.
+
+**options (array of objects)**
+
+If further target server options are added, you can use rp.addOptions to update your existing options collection.
+This method will not overwrite your previous collection.
+
+**boolean (ssl flag)**
+
+The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
+
+### Example:
+```javascript
+const server = http.createServer((req, res) => {
+ rp.init(req, res);
+}).listen(1337);
+
+ws.init(server, options, true);
 ```
 
 # Error Log Setup
