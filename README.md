@@ -51,13 +51,17 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 ```
 
-## lb.deploy ( string, array( options ) b —
+## lb.deploy ( string, array( options ), boolean[optional], function[optional] ) —
 
 **First parameter (string):** is a configuration argument for the reverse proxy server which in this case must be: ’rp’
 
 **Second parameter (array):** will be the options collection created previously created in your ‘rp.js’ file
 
-**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https or false for http
+**Third parameter (boolean) - optional:** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+
+**Fourth parameter (function) - optional:** callback function executed upon initializing objects for reverse-proxy
+
+
 #### defaults to false when no argument is given**
 
 ### DDoS Considerations
