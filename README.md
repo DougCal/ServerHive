@@ -232,9 +232,7 @@ This method will not overwrite your previous collection.
 The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
 
 **IMPORTANT NOTE ON POOLING FEATURE**
-All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}
-
-
+All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly. 
 
 ### Example:
 ```javascript
@@ -249,19 +247,19 @@ ws.init(server, options, true);
 
 Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
 
-## errorLog.Init ( string ) --
+## errorLog.init ( string ) --
 
 Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
 This method will simply store the file path.
 
 ```javascript
-errorLog.Init(path.join(__dirname + '/healthCheck.log'));
+errorLog.init(path.join(__dirname + '/healthCheck.log'));
 ```
 
 ## errorLog.write ( object ) --
 
 Accepts the error object as it's parameter to be written to the log file.
-Method will read the previous copy of the file before re-writing it and concatinating the old data with the new data.
+Method will read the previous copy of the file before re-writing it and concatenating the old data with the new data.
 
 ```javascript
 res.on('end', () => {
@@ -274,8 +272,9 @@ res.on('end', () => {
 ```
 
 # Redis Sessions Setup
+NodeLB comes packaged with a lightweight controller to store and read session data from a Redis server, providing a central session data store between multiple target servers.
 
-A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object
+A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object on the target server.
 [see Redis documentation for more information on setting up your personal Redis instance](https://redis.io/documentation)
 The deploy method requires the Redis server address in the options argument (host/ip and port) and creates/returns the ‘rs’ (Redis sessions) object.
 
@@ -289,9 +288,9 @@ const lb = require(‘nodelb’);
 const rs = lb.deploy(‘redis’, options);
 ```
 
-## rs.authenticate(req, res, cookieKey, uniqueId, cb) // Authentication:
+## rs.authenticate(req, res, cookieKey(string), uniqueId(string), cb(function))
 
-Encrypts and saves session cookie in Redis
+Encrypts (SHA-256 via crypto module) and saves session cookie in Redis
 Sets cookie in header (DOES NOT END RESPONSE)
 
 **Req (object):** client request object
@@ -302,11 +301,11 @@ Sets cookie in header (DOES NOT END RESPONSE)
 
 **uniqueId (string):** uniqueId per cookieKey (e.g. username)
 
-**Cb (function):** callback function executed after redis save - includes redis error and reply messages --
+**Cb (function):** callback function executed after redis save - includes redis error and reply arguments --
 
 Example: `(err, reply) => {. . .}`
 
-## rs.verifySession(req, cookieKey, cb) // VerifySession:
+## rs.verifySession(req, cookieKey(string), cb(function))
 Parses cookies in request header
 Validates session cookies against central redis store
 Returns true or false based on cookie validity
@@ -320,13 +319,23 @@ Returns true or false based on cookie validity
 Example: `(sessionVerified) => {. . .}`
 
 # Threads Setup
-Since node is a single-threaded application natively, we provide the option to use all the threads on your target servers using the Node cluster module. Utilizing this module, the servers will be able to sustain a much higher load than when node is running single-threaded solely.
+Since node is built on a single-threaded foundation, we provide the option to use all threads on target servers using the Node cluster module. Utilizing this module, the target servers will be able to sustain a much higher load for synchronous tasks than when node is running single-threaded solely.
 
-To make this more relative, say your target server is able to handle 100 requests before it breaks. On a Node server running with 4 threads, it will be able to handle about 200 requests before the server breaks.  Because of its significant impact in balancing load, we made this an option in our library.
+For example, a hypothetical single-threaded target server handles 100 concurrent requests. A Node server running 4 threads in an ideal setting will be able to handle 200 concurrent requests (not accounting for OS IPC overhead).
 
-The threads will balance requests from the reverse proxy server through the cluster module’s native round-robin algorithm (except on Windows).
+The threads will balance requests to the target server through the cluster module’s native round-robin algorithm (except on Windows which has it's own scheduling policy).
 
 See more details at [Node's Cluster Module Docs](https://nodejs.org/api/cluster.html#cluster_how_it_works)
+
+## threads(server(object), port(number));
+
+The threads function commences cpu thread forking - this process includes executing the 'listen' method on the input server object (**IMPORTANT NOTE: REMOVE THE LISTEN METHOD FROM SERVER OBJECT IF USING THREADS**)
+
+**server (previously instantiated http/https server object)**
+
+The server parameter expects the object returned from the http/https createServer method
+
+**port (number):** number indicating at what port will the server/threads respond to (e.g. 80)
 
 A simple set up to getting threads started:
 
@@ -334,11 +343,10 @@ A simple set up to getting threads started:
 const lb = require('nodelb');
 const threads = lb.deploy(‘threads’);
 
-const host = 'localhost';
 const port = 3000;
-threads(host, port);
+const server = http.createServer((bReq, bRes) => {
+  // . . .
+});
+threads(server, port);
 ```
 
-**host (string):** string containing the host url
-
-**port (number):** number indicating at what port will the thread respond to (e.g. localhost:3000)
