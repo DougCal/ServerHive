@@ -143,7 +143,7 @@ Receives ‘res’ back from target servers, appends header to response, and the
 
 ### DDoS Considerations
 
-**fourth parameter must be used with fifth parameter for the purpose of ip throttling**
+*****fourth parameter must be used with fifth parameter for the purpose of ip throttling*****
 
 **Fourth parameter (number) - optional:** milliseconds allowed between n (defined below) number of client requests per ip - 500 Server Error will result from violating ip throttling rules setup with fourth and fifth parameters.
 
