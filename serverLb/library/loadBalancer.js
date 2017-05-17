@@ -305,6 +305,11 @@ class LoadBalancer extends EventEmitter {
   lbInit(options, cb) {
     if (options === null || options === undefined) throw 'Error: Options is a required parameter for this method';
     this.options = options;
+    this.options.forEach((option) => {
+      option.openSockets = 0;
+      option.openRequests = 0;
+      option.active = true;
+    });
     if (cb) cb();
     return this;
   }

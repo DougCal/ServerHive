@@ -21,7 +21,7 @@ class WsProxy extends eventEmitter {
   constructor() {
     super();
     this.tunnels = [];
-    this.init = (server, options, isSecure) => {
+    this.init = (server, options, isSecure = false) => {
       if (options === null || options === undefined) throw 'Error: Options parameter not provided'
       const wss = new WebSocket.Server({ server });
       wss.on('connection', (clientWs) => {
