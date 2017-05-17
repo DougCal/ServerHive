@@ -9606,7 +9606,7 @@ var App = function (_Component) {
   }, {
     key: 'openSocket',
     value: function openSocket() {
-      var ws = new WebSocket('wss://localhost:1337');
+      var ws = new WebSocket('ws://localhost:1337');
       ws.onopen = function () {
         ws.send('Im here!');
         // const payload = { socketPoolId: 5 };
@@ -9624,7 +9624,7 @@ var App = function (_Component) {
     value: function componentDidMount() {
       this.verifyUser();
       this.getStats();
-      // setInterval(this.getStats, 1000);
+      setInterval(this.getStats, 300);
       console.log('verifying. . .');
       // setInterval(this.getStatsSocket, 250);
       this.wsSend = this.openSocket();
@@ -9663,40 +9663,6 @@ var App = function (_Component) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
-            { onClick: function onClick() {
-                return _this2.wsSend(JSON.stringify({ socketPoolId: 3 }));
-              } },
-            'Socket Send Pool 3'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
-            { onClick: function onClick() {
-                return _this2.wsSend(JSON.stringify({ socketPoolId: 4 }));
-              } },
-            'Socket Send Pool 4'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
-            { onClick: function onClick() {
-                return _this2.wsSend(JSON.stringify({ socketPoolId: 5 }));
-              } },
-            'Socket Send Pool 5'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
-            { onClick: function onClick() {
-                return _this2.getStats();
-              } },
-            'GetStats'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-          'Congrats! You\'re logged in! ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Stats__["a" /* default */], { stats: this.state.stats })
         );
       }
@@ -9734,13 +9700,28 @@ var Bar = function Bar(props) {
   for (var i = 0; i < props.requests / props.divisor; i += 1) {
     bar.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'bar' }));
   }
+  var serverName = 'App Server';
+  switch (props.server) {
+    case 'Cached Response':
+      serverName = 'Reverse Proxy Cache';
+      break;
+    case '127.0.0.1:3000':
+      serverName = 'App Server 1';
+      break;
+    case '127.0.0.1:4000':
+      serverName = 'App Server 2';
+      break;
+    case '127.0.0.1:5000':
+      serverName = 'App Server 3';
+      break;
+  }
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'div',
     { className: 'server' },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       { className: 'serverId' },
-      props.server
+      serverName
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
@@ -11113,6 +11094,20 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
       return emptyFunction.thatReturnsNull;
     }
 
+    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+      var checker = arrayOfTypeCheckers[i];
+      if (typeof checker !== 'function') {
+        warning(
+          false,
+          'Invalid argument supplid to oneOfType. Expected an array of check functions, but ' +
+          'received %s at index %s.',
+          getPostfixForTypeWarning(checker),
+          i
+        );
+        return emptyFunction.thatReturnsNull;
+      }
+    }
+
     function validate(props, propName, componentName, location, propFullName) {
       for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
         var checker = arrayOfTypeCheckers[i];
@@ -11245,6 +11240,9 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
   // This handles more types than `getPropType`. Only used for error messages.
   // See `createPrimitiveTypeChecker`.
   function getPreciseType(propValue) {
+    if (typeof propValue === 'undefined' || propValue === null) {
+      return '' + propValue;
+    }
     var propType = getPropType(propValue);
     if (propType === 'object') {
       if (propValue instanceof Date) {
@@ -11254,6 +11252,23 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
       }
     }
     return propType;
+  }
+
+  // Returns a string that is postfixed to a warning about an invalid type.
+  // For example, "undefined" or "of type array"
+  function getPostfixForTypeWarning(value) {
+    var type = getPreciseType(value);
+    switch (type) {
+      case 'array':
+      case 'object':
+        return 'an ' + type;
+      case 'boolean':
+      case 'date':
+      case 'regexp':
+        return 'a ' + type;
+      default:
+        return type;
+    }
   }
 
   // Returns class name of the object, if any.
