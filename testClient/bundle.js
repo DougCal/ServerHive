@@ -9606,7 +9606,7 @@ var App = function (_Component) {
   }, {
     key: 'openSocket',
     value: function openSocket() {
-      var ws = new WebSocket('wss://localhost:1337');
+      var ws = new WebSocket('ws://localhost:1337');
       ws.onopen = function () {
         ws.send('Im here!');
         // const payload = { socketPoolId: 5 };

@@ -60,7 +60,7 @@ class App extends Component {
   }
 
   openSocket() {
-    const ws = new WebSocket('wss://localhost:1337');
+    const ws = new WebSocket('ws://localhost:1337');
     ws.onopen = () => {
       ws.send('Im here!')
       // const payload = { socketPoolId: 5 };

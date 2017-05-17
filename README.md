@@ -1,7 +1,7 @@
 # Installation
 
 ```
-$ npm install nodelb
+$ npm install nodexchange
 ```
 
 # Features
@@ -33,7 +33,7 @@ $ npm install nodelb
 Include our library in your application using:
 
 ```javascript
-const lb = require(‘nodelb’);
+const lb = require(‘nodexchange’);
 ```
 
 ## Options  —
@@ -77,15 +77,17 @@ lb.deploy triggers the creation of the reverse proxy object.
 const rp = lb.deploy(‘rp’, options);
 ```
 
-lb.deploy has three specific strings that can be used in this library.
+lb.deploy has five specific strings that can be used in this library.
 
-To see the other use cases and strings for lb.deploy in this library, click these links:
+*****To see the other use cases and strings for lb.deploy in this library, click these links:*****
 
-* [Websocket Deploy Section](https://github.com/DataHiveDJW/ServerHive/blob/master/README.md#websockets-setup)
+* [Websocket Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#websockets-setup)
 
-* [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
+* [Error Log Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#error-log-setup)
 
-* [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#threads-setup)
+* [Redis Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#redis-sessions-setup)
+
+* [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#threads-setup)
 
 ## rp.addOptions ( options ) —
 
@@ -139,11 +141,11 @@ Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to target servers if it does not exist in cache
 Receives ‘res’ back from target servers, appends header to response, and then pipes/ends response back to browser
 
-**Third parameter (boolean):** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+**Third parameter (boolean):** to set up your protocol input true for https and false for http
 
 ### DDoS Considerations
 
-***fourth parameter must be used with fifth parameter for the purpose of ip throttling***
+*****fourth parameter must be used with fifth parameter for the purpose of ip throttling*****
 
 **Fourth parameter (number) - optional:** milliseconds allowed between n (defined below) number of client requests per ip - 500 Server Error will result from violating ip throttling rules setup with fourth and fifth parameters.
 
@@ -212,13 +214,13 @@ The websockets feature extends http/https routing and load-balancing to websocke
 
 ### Example:
 ```javascript
-const ws = lb.deploy(‘wspool'); // or lb.deploy(‘ws');
+const ws = lb.deploy('wspool'); // or lb.deploy('ws');
 ```
 
 ## ws.init ( server, options, boolean[optional] ) —
 This method commences websocket routing. 
 
-**server (previously instatiated http(s) server object)**
+**server (previously instantiated http(s) server object)**
 
 The server parameter expects the object returned from the http/https createServer method. The websockets feature leverages the same port as http/https server.
 
@@ -247,6 +249,15 @@ ws.init(server, options, true);
 
 Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
 
+## lb.deploy ( string ) —
+
+**First parameter (string):** is a configuration argument for the error log library which in this case must be ’errorLog’ to gain access to the init and write methods.
+
+### Example:
+```javascript
+const errorLog = lb.deploy('errorLog');
+```
+
 ## errorLog.init ( string ) --
 
 Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
@@ -272,19 +283,19 @@ res.on('end', () => {
 ```
 
 # Redis Sessions Setup
-NodeLB comes packaged with a lightweight controller to store and read session data from a Redis server, providing a central session data store between multiple target servers.
+Nodexchange comes packaged with a lightweight controller to store and read session data from a Redis server, providing a central session data store between multiple target servers.
 
 A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object on the target server.
 [see Redis documentation for more information on setting up your personal Redis instance](https://redis.io/documentation)
 The deploy method requires the Redis server address in the options argument (host/ip and port) and creates/returns the ‘rs’ (Redis sessions) object.
 
 ```javascript
+const lb = require(‘nodexchange’);
 const options = {
   host: '127.0.0.1', // —> string hostname or IP address
   port: 6379,        // —> integer port number
 };
 
-const lb = require(‘nodelb’);
 const rs = lb.deploy(‘redis’, options);
 ```
 
@@ -340,7 +351,7 @@ The server parameter expects the object returned from the http/https createServe
 A simple set up to getting threads started:
 
 ```javascript
-const lb = require('nodelb');
+const lb = require('nodexchange');
 const threads = lb.deploy(‘threads’);
 
 const port = 3000;
