@@ -214,7 +214,7 @@ The websockets feature extends http/https routing and load-balancing to websocke
 
 ### Example:
 ```javascript
-const ws = lb.deploy(‘wspool'); // or lb.deploy(‘ws');
+const ws = lb.deploy('wspool'); // or lb.deploy('ws');
 ```
 
 ## ws.init ( server, options, boolean[optional] ) —
@@ -255,7 +255,7 @@ Handling a multitude of servers for your application requires constant monitorin
 
 ### Example:
 ```javascript
-const errorLog = lb.deploy(‘errorLog');
+const errorLog = lb.deploy('errorLog');
 ```
 
 ## errorLog.init ( string ) --
