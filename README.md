@@ -247,6 +247,15 @@ ws.init(server, options, true);
 
 Handling a multitude of servers for your application requires constant monitoring of the health of each individual server. To coincide with our health check functionality, we provided some simple to use methods to create an error log path that can cleanly and readibly store the results of errors from health checks.
 
+## lb.deploy ( string ) —
+
+**First parameter (string):** is a configuration argument for the error log library which in this case must be ’errorLog’ to gain access to the init and write methods.
+
+### Example:
+```javascript
+const errorLog = lb.deploy(‘errorLog');
+```
+
 ## errorLog.init ( string ) --
 
 Accepts a string as its sole parameter which provides your desired file path for the log file to be generated at.
