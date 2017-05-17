@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
-const errorLog = require('./../serverLb/library/errorLog');
+// const errorLog = require('./../serverLb/library/errorLog');
 const statsController = require('../controllers/statsController');
 
 // const options = [
@@ -36,7 +36,9 @@ const rp = lb.deploy('rp', options, () => statsController.createSession(options)
 const wspool = lb.deploy('wspool');
 
 
+const errorLog = lb.deploy('errorLog');
 errorLog.init(path.join(__dirname + '/healthCheck.log'));
+
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 // method for checking https
 // method for checking http
