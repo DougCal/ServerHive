@@ -79,9 +79,12 @@ class LoadBalancer extends EventEmitter {
     if (options === null || options === undefined) throw 'Error: Options is a required parameter for addOptions';
 
     for (let i = 1; i < options.length; i += 1) {
+      options[i].openSockets = 0;
+      options[i].openRequests = 0;
+      options[i].active = true;
       this.options.push(options[i]);
     }
-  };
+  }
 
   /**
    * Pings all target servers on an interval (if provided) or when method is called
