@@ -45,7 +45,7 @@ class LoadBalancer extends EventEmitter {
    * Stores desired application routes for reverse-proxy to cache responses for
    * @param {Array} -- Nested Array of Request Type & Route
    * @public
-   * Example: 
+   * Example:
    * `rp.setRoutes([['GET', '/'], ['GET', '/html']]);`
    */
 
@@ -142,7 +142,7 @@ class LoadBalancer extends EventEmitter {
     }
   }
 
-  /** 
+  /**
    * Checks if request is considered 'static' - HTML, CSS, JS file
    * Method is not available to users
    * @param {Object} -- Browser request object
@@ -238,7 +238,7 @@ class LoadBalancer extends EventEmitter {
       return throttleIP(bReq, bRes, delay, requests)
     }
     if ((delay > 0 && requests <= 0) || (delay <= 0 && requests > 0)) {
-      throw 'Error: both delay and requests need to be defined if you want to throtte ip addresses';
+      throw 'Error: both delay and requests need to be defined if you want to throttle ip addresses';
     }
     const options = this.options;
     const cache = this.cache;
