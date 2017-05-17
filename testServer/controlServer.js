@@ -4,8 +4,24 @@ const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
 // const lb = require('nodelb');
-const errorLog = require('./../serverLb/library/errorLog');
+// const errorLog = require('./../serverLb/library/errorLog');
 const statsController = require('../controllers/statsController');
+
+// const options = [
+//   {
+//     hostname: '127.0.0.1',
+//     port: 3000,
+//   },
+//   {
+//     hostname: '127.0.0.1',
+//     port: 4000,
+//   },
+//   {
+//     hostname: '127.0.0.1',
+//     port: 5000,
+//   },
+// ];
+
 
 
 const options = [];
@@ -13,9 +29,6 @@ for (let i = 2; i < process.argv.length; i += 2) {
   options.push({
     hostname: process.argv[i],
     port: process.argv[i + 1],
-    openSockets: 0,
-    openRequests: 0,
-    active: true,
   });
 }
 
@@ -23,7 +36,9 @@ const rp = lb.deploy('rp', options, () => statsController.createSession(options)
 const wspool = lb.deploy('wspool');
 
 
+const errorLog = lb.deploy('errorLog');
 errorLog.init(path.join(__dirname + '/healthCheck.log'));
+
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
 // method for checking https
 // method for checking http

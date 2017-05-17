@@ -3,7 +3,7 @@ const https = require('https');
 const path = require('path');
 const fs = require('fs');
 const lb = require('../serverLb/library/nodelb');
-// const lb = require('nodelb');
+const lb = require('nodelb');
 const wsController = require('../controllers/wsController');
 
 const options = {

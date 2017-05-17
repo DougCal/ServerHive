@@ -1,9 +1,10 @@
 const https = require('https');
 const http = require('http');
 const EventEmitter = require('events');
-const fs = require('fs');
-const errorLog = require('./errorLog');
+const el = require('./errorLog');
 const throttleIP = require('./throttleIP');
+
+const errorLog = el();
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -305,6 +306,11 @@ class LoadBalancer extends EventEmitter {
   lbInit(options, cb) {
     if (options === null || options === undefined) throw 'Error: Options is a required parameter for this method';
     this.options = options;
+    this.options.forEach((option) => {
+      option.openSockets = 0;
+      option.openRequests = 0;
+      option.active = true;
+    });
     if (cb) cb();
     return this;
   }
