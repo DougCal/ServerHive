@@ -19,11 +19,11 @@ $ npm install nodelb
  * Least-connections / round-robin load-balancing algorithm for http(s) and web sockets
 
 ### 3. Additional Features :
- 
+
  * Error logging
- 
+
  * IP throttling
- 
+
  * Direct compability with Redis for session storage
 
  * Direct compability with the Node Cluster module for multi-threading Node instances
@@ -77,9 +77,9 @@ lb.deploy triggers the creation of the reverse proxy object.
 const rp = lb.deploy(‘rp’, options);
 ```
 
-lb.deploy has three specific strings that can be used in this library.
+lb.deploy has five specific strings that can be used in this library.
 
-To see the other use cases and strings for lb.deploy in this library, click these links:
+*****To see the other use cases and strings for lb.deploy in this library, click these links:*****
 
 * [Websocket Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#websockets-setup)
 
@@ -129,7 +129,7 @@ rp.setRoutes can be called multiple times and will add the new routes to the rou
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 ```
 
-## rp.init ( req , res, boolean, number[optional], number[optional] ) —
+## rp.init ( req , res, boolean[optional], number[optional], number[optional] ) —
 
 **This method sends/ends the response to the client**
 
@@ -210,7 +210,7 @@ The websockets feature extends http/https routing and load-balancing to websocke
 
 ## lb.deploy ( string ) —
 
-**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option 
+**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option
 
 ### Example:
 ```javascript
@@ -218,7 +218,7 @@ const ws = lb.deploy('wspool'); // or lb.deploy('ws');
 ```
 
 ## ws.init ( server, options, boolean[optional] ) —
-This method commences websocket routing. 
+This method commences websocket routing.
 
 **server (previously instantiated http(s) server object)**
 
@@ -234,7 +234,7 @@ This method will not overwrite your previous collection.
 The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
 
 **IMPORTANT NOTE ON POOLING FEATURE**
-All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly. 
+All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly.
 
 ### Example:
 ```javascript
@@ -360,4 +360,3 @@ const server = http.createServer((bReq, bRes) => {
 });
 threads(server, port);
 ```
-
