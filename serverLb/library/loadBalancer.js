@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const el = require('./errorLog');
 const throttleIP = require('./throttleIP');
 
-const errorLog = el();
+const errorLog = el(false);
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -102,6 +102,7 @@ class LoadBalancer extends EventEmitter {
 
     // Loops through servers in options & sends mock requests to each
     for (let i = 0; i < options.length; i += 1) {
+      console.log(options[i]);
       protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
           console.log(res.statusCode);
