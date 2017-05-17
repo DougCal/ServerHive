@@ -139,11 +139,11 @@ Checks cache for existence of incoming ‘req’
 Accepts ‘req’ and pipes it to target servers if it does not exist in cache
 Receives ‘res’ back from target servers, appends header to response, and then pipes/ends response back to browser
 
-**Third parameter (boolean):** to set up your protocol (http/https), put true for https for ssl encryption or false for http
+**Third parameter (boolean):** to set up your protocol input true for https and false for http
 
 ### DDoS Considerations
 
-***fourth parameter must be used with fifth parameter for the purpose of ip throttling***
+**fourth parameter must be used with fifth parameter for the purpose of ip throttling**
 
 **Fourth parameter (number) - optional:** milliseconds allowed between n (defined below) number of client requests per ip - 500 Server Error will result from violating ip throttling rules setup with fourth and fifth parameters.
 
@@ -218,7 +218,7 @@ const ws = lb.deploy(‘wspool'); // or lb.deploy(‘ws');
 ## ws.init ( server, options, boolean[optional] ) —
 This method commences websocket routing. 
 
-**server (previously instatiated http(s) server object)**
+**server (previously instantiated http(s) server object)**
 
 The server parameter expects the object returned from the http/https createServer method. The websockets feature leverages the same port as http/https server.
 
