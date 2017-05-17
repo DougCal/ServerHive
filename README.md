@@ -81,7 +81,9 @@ lb.deploy has three specific strings that can be used in this library.
 
 To see the other use cases and strings for lb.deploy in this library, click these links:
 
-* [Websocket Deploy Section](https://github.com/DataHiveDJW/ServerHive/blob/master/README.md#websockets-setup)
+* [Websocket Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#websockets-setup)
+
+* [Error Log Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#error-log-setup)
 
 * [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
 
