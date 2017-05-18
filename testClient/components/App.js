@@ -60,7 +60,7 @@ class App extends Component {
   }
 
   openSocket() {
-    const ws = new WebSocket('wss://localhost:1337');
+    const ws = new WebSocket('ws://localhost:1337');
     ws.onopen = () => {
       ws.send('Im here!')
       // const payload = { socketPoolId: 5 };
@@ -75,7 +75,7 @@ class App extends Component {
   componentDidMount() {
     this.verifyUser();
     this.getStats();
-    // setInterval(this.getStats, 1000);
+    setInterval(this.getStats, 300);
     console.log('verifying. . .');
     // setInterval(this.getStatsSocket, 250);
     this.wsSend = this.openSocket();
@@ -98,11 +98,11 @@ class App extends Component {
     } else {
       return (
         <div>
-          <button onClick = {() => this.wsSend(JSON.stringify({ socketPoolId: 3 }))}>Socket Send Pool 3</button><br />
+          {/*<button onClick = {() => this.wsSend(JSON.stringify({ socketPoolId: 3 }))}>Socket Send Pool 3</button><br />
           <button onClick = {() => this.wsSend(JSON.stringify({ socketPoolId: 4 }))}>Socket Send Pool 4</button><br />
           <button onClick = {() => this.wsSend(JSON.stringify({ socketPoolId: 5 }))}>Socket Send Pool 5</button><br />
           <button onClick = {() => this.getStats()}>GetStats</button><br />
-          Congrats! You're logged in! <br />
+          Congrats! You're logged in! <br />*/}
           <Stats stats = {this.state.stats}/>
         </div>
       )

@@ -1,7 +1,7 @@
 # Installation
 
 ```
-$ npm install nodelb
+$ npm install nodexchange
 ```
 
 # Features
@@ -16,14 +16,14 @@ $ npm install nodelb
 
 ### 2. Load-Balancing features such as :
 
- * Least-connections / round-robin load-balancing algorithm for http(s) and web sockets
+ * Least-connections / round-robin load-balancing algorithm for http/https and web sockets
 
 ### 3. Additional Features :
- 
+
  * Error logging
- 
+
  * IP throttling
- 
+
  * Direct compability with Redis for session storage
 
  * Direct compability with the Node Cluster module for multi-threading Node instances
@@ -33,7 +33,7 @@ $ npm install nodelb
 Include our library in your application using:
 
 ```javascript
-const lb = require(‘nodelb’);
+const lb = require(‘nodexchange’);
 ```
 
 ## Options  —
@@ -77,17 +77,17 @@ lb.deploy triggers the creation of the reverse proxy object.
 const rp = lb.deploy(‘rp’, options);
 ```
 
-lb.deploy has three specific strings that can be used in this library.
+lb.deploy has five specific strings that can be used in this library.
 
-To see the other use cases and strings for lb.deploy in this library, click these links:
+*****To see the other use cases and strings for lb.deploy in this library, click these links:*****
 
-* [Websocket Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#websockets-setup)
+* [Websocket Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#websockets-setup)
 
-* [Error Log Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#error-log-setup)
+* [Error Log Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#error-log-setup)
 
-* [Redis Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#redis-sessions-setup)
+* [Redis Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#redis-sessions-setup)
 
-* [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodeLB/blob/master/README.md#threads-setup)
+* [Multi-Threading Deploy Section](https://github.com/DataHiveDJW/nodexchange/blob/master/README.md#threads-setup)
 
 ## rp.addOptions ( options ) —
 
@@ -129,7 +129,7 @@ rp.setRoutes can be called multiple times and will add the new routes to the rou
 const routes = [['GET', '/puppies'], ['POST', '/login']];
 ```
 
-## rp.init ( req , res, boolean, number[optional], number[optional] ) —
+## rp.init ( req , res, boolean[optional], number[optional], number[optional] ) —
 
 **This method sends/ends the response to the client**
 
@@ -210,7 +210,7 @@ The websockets feature extends http/https routing and load-balancing to websocke
 
 ## lb.deploy ( string ) —
 
-**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option 
+**First parameter (string):** is a configuration argument for the load-balance library which in this case must be: ’wspool’ to initialize websocket proxying for the pooling option or 'ws' for the non-pooling option
 
 ### Example:
 ```javascript
@@ -218,7 +218,7 @@ const ws = lb.deploy('wspool'); // or lb.deploy('ws');
 ```
 
 ## ws.init ( server, options, boolean[optional] ) —
-This method commences websocket routing. 
+This method commences websocket routing.
 
 **server (previously instantiated http(s) server object)**
 
@@ -234,7 +234,7 @@ This method will not overwrite your previous collection.
 The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
 
 **IMPORTANT NOTE ON POOLING FEATURE**
-All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly. 
+All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly.
 
 ### Example:
 ```javascript
@@ -283,19 +283,19 @@ res.on('end', () => {
 ```
 
 # Redis Sessions Setup
-NodeLB comes packaged with a lightweight controller to store and read session data from a Redis server, providing a central session data store between multiple target servers.
+Nodexchange comes packaged with a lightweight controller to store and read session data from a Redis server, providing a central session data store between multiple target servers.
 
 A Redis server must be setup as a prerequisite to utilizing the Redis Sessions object on the target server.
 [see Redis documentation for more information on setting up your personal Redis instance](https://redis.io/documentation)
 The deploy method requires the Redis server address in the options argument (host/ip and port) and creates/returns the ‘rs’ (Redis sessions) object.
 
 ```javascript
+const lb = require(‘nodexchange’);
 const options = {
   host: '127.0.0.1', // —> string hostname or IP address
   port: 6379,        // —> integer port number
 };
 
-const lb = require(‘nodelb’);
 const rs = lb.deploy(‘redis’, options);
 ```
 
@@ -351,7 +351,7 @@ The server parameter expects the object returned from the http/https createServe
 A simple set up to getting threads started:
 
 ```javascript
-const lb = require('nodelb');
+const lb = require('nodexchange');
 const threads = lb.deploy(‘threads’);
 
 const port = 3000;
@@ -360,4 +360,3 @@ const server = http.createServer((bReq, bRes) => {
 });
 threads(server, port);
 ```
-
