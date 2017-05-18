@@ -40,6 +40,7 @@ const errorLog = lb.deploy('errorLog');
 errorLog.init(path.join(__dirname + '/healthCheck.log'));
 
 rp.setRoutes([['GET', '/']]); // ['GET', '/html']
+rp.clearCache(3000);
 // method for checking https
 // method for checking http
 
@@ -67,7 +68,7 @@ const secureOpts = {
   cert: fs.readFileSync('server-crt.pem'),
   ca: fs.readFileSync('ca-crt.pem'),
 };
-rp.healthCheck(10000, true);
+rp.healthCheck(100000, false);
 const server = https.createServer(secureOpts, (bReq, bRes) => {
   // console.log(options[0].active, options[1].active, options[2].active);
   if (bReq.method === 'GET' && bReq.url === '/stats') return statsController.getServerStats(bReq, bRes);
