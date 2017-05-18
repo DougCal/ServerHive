@@ -28,6 +28,12 @@ errorLog.write = (error) => {
   queue.push(error);
 }
 
+let logStream = fs.createWriteStream(errorLog.path, {flags:'a'});
+
+const errorStream = (stream) => {
+  logStream.write(stream);
+}
+
 errorLog.readWrite = () => {
   if (errorLog.path && queue.length > 0) {
     let error = queue.shift();

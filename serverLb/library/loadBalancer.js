@@ -139,12 +139,13 @@ class LoadBalancer extends EventEmitter {
    */
 
   clearCache(interval = null) {
-    this.cache = {};
     if (interval !== null) {
       setTimeout(() => {
-        this.clearCache(this.cache, interval);
+        this.clearCache(interval);
       }, interval);
     }
+    this.cache = {};
+    console.log('Cache Cleared');
   }
 
   /**

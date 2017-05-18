@@ -39,22 +39,15 @@ console.log('Server running at 127.0.0.1:1337');
 
 wspool.init(server, options, false);
 
-
-
-
-
-
-
-
-
-
-
+rp.setRoutes([['GET', '/']]); // ['GET', '/html']
+rp.clearCache(3000);
+// method for checking https
+// method for checking http
 
 // uncomment secureOpts for when testing https
 
 // ONLY uncomment below for testing https with a self-signed certificate
 // uncomment to create a server with SSL and make sure secureOpts is uncommented
-
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 // const secureOpts = {
 //   key: fs.readFileSync('server-key.pem'),
@@ -70,7 +63,6 @@ wspool.init(server, options, false);
 // console.log('Server blah running at 127.0.0.1:1337');
 
 // wspool.init(server, options, true);
-
 
 //console.log(process.memoryUsage().heapUsed); //----------- memory test
 
