@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const el = require('./errorLog');
 const throttleIP = require('./throttleIP');
 
-const errorLog = el();
+const errorLog = el(false);
 
 class LoadBalancer extends EventEmitter {
   constructor() {
@@ -79,9 +79,12 @@ class LoadBalancer extends EventEmitter {
     if (options === null || options === undefined) throw 'Error: Options is a required parameter for addOptions';
 
     for (let i = 1; i < options.length; i += 1) {
+      options[i].openSockets = 0;
+      options[i].openRequests = 0;
+      options[i].active = true;
       this.options.push(options[i]);
     }
-  };
+  }
 
   /**
    * Pings all target servers on an interval (if provided) or when method is called
@@ -102,6 +105,7 @@ class LoadBalancer extends EventEmitter {
 
     // Loops through servers in options & sends mock requests to each
     for (let i = 0; i < options.length; i += 1) {
+      console.log(options[i]);
       protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
           console.log(res.statusCode);
@@ -135,12 +139,13 @@ class LoadBalancer extends EventEmitter {
    */
 
   clearCache(interval = null) {
-    this.cache = {};
     if (interval !== null) {
       setTimeout(() => {
-        this.clearCache(this.cache, interval);
+        this.clearCache(interval);
       }, interval);
     }
+    this.cache = {};
+    console.log('Cache Cleared');
   }
 
   /**
