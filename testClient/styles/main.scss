@@ -1,11 +1,54 @@
-$color-back : linear-gradient(silver,lightslategray);
-$color-book: rgba(255,255,240, 0.5);
+$color-back : #062F4F; // linear-gradient(white, silver);
+$panel-back : #062F4F;
+$color-rp-from : #B82601;
+$color-rp-to : #813772;
+$color-app-from : #062F4F;
+$color-app-to : #813772;
+$rp-text : black;
+$app-text : #cccac9;
+$header-text : #cccac9;
 $font: verdana;
 
 body {
   background: $color-back;
-  min-height: 500px;
+  min-height: 1000px;
   width: 100%;
+  min-width: 1080px;
+  float: left; 
+}
+
+
+h1 {
+  color: $header-text;
+  text-align: center;
+  font-size: 50px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+h2 {
+  color: $header-text;
+  text-align: center;
+  font-size: 20px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#panel {
+  background: $panel-back;
+  width: 90%;
+  height: 750px;
+  margin: 0 auto;
+  border-radius: 10px;
+  // box-shadow: 3px 3px;
+}
+
+#appServers {
+  float: left;
+  width: 45%;
+}
+
+#rp {
+  float: left;
+  width: 45%;
 }
 
 .bar {
@@ -18,17 +61,33 @@ body {
 }
 
 .server {
-  color: darkslategray;
+  color: $app-text;
   height: 150px;
-  clear: both;
-  background-image: url('../img/server.jpg');
-  background-size: 100% 100%;
-  margin: 30px;
-  width: 600px;
-  border: 1px solid grey;
+  // clear: both;
+  // background-image: url('../img/server.jpg');
+  // background-size: 100% 100%;
+  background: linear-gradient(to bottom right, $color-app-from, $color-app-to);
+  margin: 10px auto;
+  width: 400px;
+  border: 1px solid black;
   border-radius: 20px;
   padding: 10px 20px;
-  box-shadow: 1px 1px 3px green;
+  box-shadow: 1px 1px 3px black;
+}
+
+.proxyServer {
+  color: $rp-text;
+  height: 150px;
+  // clear: both;
+  // background-image: url('../img/server.jpg');
+  // background-size: 100% 100%;
+  background: linear-gradient(to bottom right, $color-rp-from, $color-rp-to);
+  margin: 10px auto;
+  width: 400px;
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 10px 20px;
+  box-shadow: 1px 1px 3px black;
 }
 
 .serverId {
