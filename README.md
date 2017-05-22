@@ -77,7 +77,7 @@ lb.deploy triggers the creation of the reverse proxy object.
 const rp = lb.deploy(‘rp’, options);
 ```
 
-lb.deploy has five specific strings that can be used in this library.
+lb.deploy has six specific strings that can be used in this library.
 
 *****To see the other use cases and strings for lb.deploy in this library, click these links:*****
 
