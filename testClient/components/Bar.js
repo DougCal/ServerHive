@@ -23,7 +23,7 @@ const Bar = (props) => {
       break; 
   }
   return (
-    <div className = 'server'>
+    <div className = { serverName === 'Reverse Proxy Cache' ? 'proxyServer' : 'server' }>
       <div className = 'serverId'>{serverName}</div>
       <div className = 'serverRequests'>{props.requests}</div>
       {/*<div className = 'bar' style = {{width: props.requests * 5}}></div>*/}
