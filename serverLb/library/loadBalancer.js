@@ -13,6 +13,7 @@ class LoadBalancer extends EventEmitter {
     this.cache = {};
     this.options = [];
     this.routes = {};
+    this.getCache = this.getCache.bind(this);
     this.addOptions = this.addOptions.bind(this);
     this.setRoutes = this.setRoutes.bind(this);
     this.healthCheck = this.healthCheck.bind(this);
@@ -40,6 +41,15 @@ class LoadBalancer extends EventEmitter {
 
   setAlgoLC() {
     this.algo = 'lc';
+  }
+
+  /**
+   * Retrieves current cache from library and returns out to user
+   * @public
+   */
+
+  getCache() {
+    return this.cache;
   }
 
   /**
