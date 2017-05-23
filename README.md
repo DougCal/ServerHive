@@ -204,6 +204,20 @@ rp.clearCache(10000);
 // interval is null
 rp.clearCache();
 ```
+
+## rp.getCache ( ) -
+
+Returns an object of what is currently cached.
+
+## rp.setAlgoLC ( ) -
+
+Sets the load-balancing algorithm to least-connections.  This is the default
+algorithm in NodeXchange.
+
+## rp.setAlgoRR ( ) —
+
+Sets the load-balancing algorithm to round-robin.
+
 # Websockets Setup
 
 The websockets feature extends http/https routing and load-balancing to websocket connections. There are two websockets options, pooling and non-pooling. The pooling option expects a pool id message from the client before connecting the persistent web socket tunnel to the appropriate target server handling that web socket pool. The non-pooling options creates persistent web socket tunnels with target servers on a least connection basis.
@@ -234,7 +248,7 @@ This method will not overwrite your previous collection.
 The third boolean parameter defaults to false. If ssl communication is required between proxy server and target servers, 'true' should be used for this argument.
 
 **IMPORTANT NOTE ON POOLING FEATURE**
-All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon recieving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly.
+All web socket messages from client will be dropped until message is received with socketPoolId. Format of message must be "{'socketPoolId': 5}" where '5' is the pool id in this case (ie unique id for chatroom or lobby etc). Upon receiving this message, the web socket tunnel will be connected with the appropriate target server and messages will routed accordingly.
 
 ### Example:
 ```javascript
