@@ -115,10 +115,8 @@ class LoadBalancer extends EventEmitter {
 
     // Loops through servers in options & sends mock requests to each
     for (let i = 0; i < options.length; i += 1) {
-      console.log(options[i]);
       protocol.get(options[i], (res) => {
         if (res.statusCode > 100 && res.statusCode < 400) {
-          console.log(res.statusCode);
           if (options[i].active === false) options[i].active = true;
         } else {
           options[i].active = false;
@@ -148,14 +146,14 @@ class LoadBalancer extends EventEmitter {
    * @public
    */
 
-  clearCache(interval = null) {
+  clearCache(interval = null, cb = null) {
     if (interval !== null) {
       setTimeout(() => {
-        this.clearCache(interval);
+        this.clearCache(interval, cb);
       }, interval);
     }
     this.cache = {};
-    console.log('Cache Cleared');
+    if (cb) return cb();
   }
 
   /**
@@ -247,14 +245,13 @@ class LoadBalancer extends EventEmitter {
    */
 
   init(bReq, bRes, ssl = false, delay = 0, requests = 0) {
-    if (delay > 0 || requests > 0) throttleIP(bReq, bRes, delay, requests);
     if (!bReq) throw 'Error: The browser request was not provided to init';
     if (!bRes) throw 'Error: The browser response was not provided to init';
+    if ((delay > 0 && requests <= 0) || (delay <= 0 && requests > 0)) {
+      throw 'Error: both delay and requests need to be defined to throttle ip addresses';
+    }
     if (delay > 0 && requests > 0 && throttleIP(bReq, bRes, delay, requests) !== undefined) {
       return throttleIP(bReq, bRes, delay, requests)
-    }
-    if ((delay > 0 && requests <= 0) || (delay <= 0 && requests > 0)) {
-      throw 'Error: both delay and requests need to be defined if you want to throttle ip addresses';
     }
     const options = this.options;
     const cache = this.cache;
